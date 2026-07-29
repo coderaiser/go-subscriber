@@ -76,3 +76,35 @@ func TestStateIsolation(t *testing.T) {
 		t.End()
 	})
 }
+
+func TestStateAllEmpty(t *testing.T) {
+	tape.Test(t, "store/state: All returns empty map when no states set", func(t *tape.T) {
+		s := store.NewStateStore()
+		all := s.All()
+		t.Ok(len(all) == 0)
+		t.End()
+	})
+}
+
+func TestStateAllReturnsAllKeys(t *testing.T) {
+	tape.Test(t, "store/state: All returns all set keys", func(t *tape.T) {
+		s := store.NewStateStore()
+		s.Set("a:svc1", "active")
+		s.Set("b:svc1", "trial")
+		all := s.All()
+		t.Ok(len(all) == 2)
+		t.End()
+	})
+}
+
+func TestStateAllIsSnapshot(t *testing.T) {
+	tape.Test(t, "store/state: All returns a copy not a reference", func(t *tape.T) {
+		s := store.NewStateStore()
+		s.Set("a:svc1", "active")
+		all := s.All()
+		all["a:svc1"] = "mutated"
+		ptr, _ := s.Get("a:svc1")
+		t.Ok(*ptr == "active")
+		t.End()
+	})
+}
