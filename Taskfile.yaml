@@ -6,16 +6,16 @@ tasks:
       - go test ./...
   coverage:
     desc: |
-      Run tests with tape scoped to the library package only.
+      Run tests with subscriber scoped to the library package only.
       run.go (CLI glue) is intentionally excluded.
     cmds:
-      - go test -coverprofile=tape.out -covermode=atomic ./... > /dev/null
-      - go tool cover -func=tape.out | grep 'tape\.go'
+      - go test -coverprofile=subscriber.out -covermode=atomic ./... > /dev/null
+      - go tool cover -func=subscriber.out | grep 'subscriber\.go'
       - coverage
   build:
     desc: Build the binary for the current platform
     cmds:
-      - go build -o tape ./cmd/tape
+      - go build -o subscriber ./cmd/subscriber
   release:snapshot:
     desc: |
       Dry-run GoReleaser locally — builds all platform binaries into ./dist
@@ -37,11 +37,11 @@ tasks:
   clean:
     desc: Remove build artefacts
     cmds:
-      - rm -f tape tape.out tape.html
+      - rm -f subscriber subscriber.out subscriber.html
       - rm -rf dist
   run:
     desc: |
-      Run tape against a tape profile.
+      Run subscriber against a subscriber profile.
       Usage: task run -- -f myproject.out --code-frame
     cmds:
-      - go run ./cmd/tape {{.CLI_ARGS}}
+      - go run ./cmd/subscriber {{.CLI_ARGS}}
