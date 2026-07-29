@@ -1,19 +1,19 @@
 version: 2
 
-project_name: coverage
+project_name: subscriber
 
 before:
   hooks:
     - go mod tidy
 
 builds:
-  - id: coverage
-    main: ./cmd/coverage
-    binary: coverage
+  - id: subscriber
+    main: ./cmd/subscriber
+    binary: subscriber
     env:
       - CGO_ENABLED=0
     ldflags:
-      - -s -w -X main.version={{.Version}}
+      - -s -w
     goos:
       - linux
       - darwin
@@ -33,6 +33,7 @@ archives:
         formats: [zip]
     files:
       - README.md
+      - DECISIONS.md
 
 checksum:
   name_template: checksums.txt
@@ -47,7 +48,7 @@ changelog:
 
 release:
   github:
-    owner: your-org
-    name: coverage
+    owner: coderaiser
+    name: go-subscriber
   draft: false
   prerelease: auto
