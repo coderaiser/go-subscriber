@@ -50,8 +50,7 @@ func New(
 
 	m, err := statemachine.New(transitions, parseState, parseEvent, states, false)
 	if err != nil {
-		log.Error("failed to build state machine", "error", err)
-		return nil
+		panic("subscriber: failed to build state machine: " + err.Error())
 	}
 	m.WithLogger(debug.Logger("subscriber:statemachine"))
 
