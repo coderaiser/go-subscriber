@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	tape "github.com/coderaiser/go-tape"
-	"github.com/coderaiser/go-subscriber/internal/engine"
 	"github.com/coderaiser/go-subscriber/internal/store"
 )
 
@@ -29,7 +28,7 @@ func TestStateGetMissingNoError(t *testing.T) {
 func TestStateSetAndGetNoError(t *testing.T) {
 	tape.Test(t, "store/state: Set does not error", func(t *tape.T) {
 		s := store.NewStateStore()
-		err := s.Set("msisdn:svc", engine.StateActive)
+		err := s.Set("msisdn:svc", "active")
 		t.NoError(err)
 		t.End()
 	})
@@ -38,9 +37,9 @@ func TestStateSetAndGetNoError(t *testing.T) {
 func TestStateGetReturnsSetValue(t *testing.T) {
 	tape.Test(t, "store/state: Get returns what was Set", func(t *tape.T) {
 		s := store.NewStateStore()
-		s.Set("msisdn:svc", engine.StateActive)
+		s.Set("msisdn:svc", "active")
 		ptr, _ := s.Get("msisdn:svc")
-		t.Ok(*ptr == engine.StateActive)
+		t.Ok(*ptr == "active")
 		t.End()
 	})
 }
@@ -48,8 +47,8 @@ func TestStateGetReturnsSetValue(t *testing.T) {
 func TestStateOverwriteNoError(t *testing.T) {
 	tape.Test(t, "store/state: overwrite does not error", func(t *tape.T) {
 		s := store.NewStateStore()
-		s.Set("k", engine.StateTrial)
-		err := s.Set("k", engine.StateSuspended)
+		s.Set("k", "trial")
+		err := s.Set("k", "suspended")
 		t.NoError(err)
 		t.End()
 	})
@@ -58,10 +57,10 @@ func TestStateOverwriteNoError(t *testing.T) {
 func TestStateOverwriteValue(t *testing.T) {
 	tape.Test(t, "store/state: Set overwrites previous value", func(t *tape.T) {
 		s := store.NewStateStore()
-		s.Set("k", engine.StateTrial)
-		s.Set("k", engine.StateSuspended)
+		s.Set("k", "trial")
+		s.Set("k", "suspended")
 		ptr, _ := s.Get("k")
-		t.Ok(*ptr == engine.StateSuspended)
+		t.Ok(*ptr == "suspended")
 		t.End()
 	})
 }
@@ -69,8 +68,8 @@ func TestStateOverwriteValue(t *testing.T) {
 func TestStateIsolation(t *testing.T) {
 	tape.Test(t, "store/state: different keys are independent", func(t *tape.T) {
 		s := store.NewStateStore()
-		s.Set("a", engine.StateActive)
-		s.Set("b", engine.StateTerminated)
+		s.Set("a", "active")
+		s.Set("b", "terminated")
 		pa, _ := s.Get("a")
 		pb, _ := s.Get("b")
 		t.Ok(*pa != *pb)

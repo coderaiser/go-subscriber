@@ -3,21 +3,20 @@ package store
 import (
 	"sync"
 
-	"github.com/coderaiser/go-subscriber/internal/engine"
 )
 
 // StateStore is the statemachine adapter.
-// It stores current engine.State per composite key (msisdn:serviceID).
+// It stores current state string per composite key (msisdn:serviceID).
 type StateStore struct {
 	mu     sync.RWMutex
-	states map[string]engine.State
+	states map[string]string
 }
 
 func NewStateStore() *StateStore {
-	return &StateStore{states: make(map[string]engine.State)}
+	return &StateStore{states: make(map[string]string)}
 }
 
-func (s *StateStore) Get(id string) (*engine.State, error) {
+func (s *StateStore) Get(id string) (*string, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	v, ok := s.states[id]
@@ -27,7 +26,7 @@ func (s *StateStore) Get(id string) (*engine.State, error) {
 	return &v, nil
 }
 
-func (s *StateStore) Set(id string, state engine.State) error {
+func (s *StateStore) Set(id string, state string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.states[id] = state
