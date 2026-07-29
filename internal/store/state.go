@@ -32,3 +32,13 @@ func (s *StateStore) Set(id string, state string) error {
 	s.states[id] = state
 	return nil
 }
+
+func (s *StateStore) All() map[string]string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	result := make(map[string]string, len(s.states))
+	for k, v := range s.states {
+		result[k] = v
+	}
+	return result
+}
