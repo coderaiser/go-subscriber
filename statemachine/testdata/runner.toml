@@ -1,0 +1,7 @@
+[transitions.idle]
+run = "running"
+
+[transitions.running]
+pass = "passed"
+fail = "failed"
+skip = "skipped"

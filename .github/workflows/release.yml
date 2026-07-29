@@ -1,0 +1,48 @@
+name: Release
+on:
+  push:
+    tags:
+      - "*"
+permissions:
+  contents: write
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Run tests
+        run: go test ./...
+      - name: Check library coverage is 100%
+        run: |
+          go test \
+            -coverprofile=coverage.out \
+            -covermode=atomic \
+            -coverpkg=coderaiser/go-coverage \
+            ./...
+          go tool cover -func=coverage.out
+  release:
+    name: GoReleaser
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          distribution: goreleaser
+          version: ~> v2
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

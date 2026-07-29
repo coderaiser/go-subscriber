@@ -1,0 +1,16 @@
+//go:build ignore
+
+package fixture
+
+import (
+	"testing"
+	tape "github.com/coderaiser/go-subscriber"
+)
+
+func TestCrossParser(t *testing.T) {
+	tape.Only(t, "parser: run action", func(t *tape.T) { t.Ok(true); t.End() })
+}
+
+func TestCrossRunner(t *testing.T) {
+	tape.Only(t, "runner: starts", func(t *tape.T) { t.Ok(true); t.End() })
+}

@@ -1,0 +1,12 @@
+# comment line
+[transitions.idle]
+run = "running"
+
+# blank line follows
+
+[states]
+initial = "idle"
+
+[transitions.running]
+pass = "passed"
+fail = "failed"
