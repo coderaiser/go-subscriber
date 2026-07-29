@@ -29,10 +29,6 @@ func serve(port string, log *slog.Logger) int {
 	ss := store.NewStateStore()
 	fs := store.NewFactsStore()
 	eng := engine.New(ss, fs, time.Now, log)
-	if eng == nil {
-		log.Error("failed to create engine")
-		return 1
-	}
 
 	h := handler.New(eng, ss)
 
