@@ -9,7 +9,7 @@ Built as a work sample for a Telco SDP assignment.
 
 Four layers. Each only talks to the layer directly below it.
 
-\`\`\`
+```
 ┌─────────────────────────────────┐
 │         HTTP Server             │  cmd/subscriber/server.go
 │  decodes requests, encodes      │  cmd/subscriber/main.go
@@ -33,7 +33,7 @@ Four layers. Each only talks to the layer directly below it.
   DEBUG=subscriber:engine
   DEBUG=subscriber:statemachine
   LOG_FORMAT=json|text
-\`\`\`
+```
 
 ## Design decisions
 
