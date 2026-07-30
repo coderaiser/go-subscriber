@@ -94,11 +94,14 @@ func newLogger() *slog.Logger {
 
 func startTestServer(ctx context.Context) (string, context.CancelFunc) {
 	log := slog.New(slog.NewTextHandler(ioDiscard{}, nil))
-	ss := store.NewStateStore()
+	st := store.NewStateStore()
+	if err := store.Seed("users.json", st); err != nil {
+        panic("subscriber: failed to load users.json: " + err.Error())
+    }
 	fs := store.NewFactsStore()
-	eng := engine.New(ss, fs, time.Now, log)
+	eng := engine.New(st, fs, time.Now, log)
 
-	h := handler.New(eng, ss)
+	h := handler.New(eng, st)
 	mux := http.NewServeMux()
 	mux.Handle("/healthz", http.HandlerFunc(handleHealth))
 	mux.Handle("/readyz", http.HandlerFunc(handleReady))
