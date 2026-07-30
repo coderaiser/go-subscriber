@@ -33,10 +33,6 @@ func New(eng *engine.Engine, states *store.StateStore) http.Handler {
 			writeJSON(w, http.StatusConflict, map[string]string{"error": err.Error()})
 			return
 		}
-		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
-			return
-		}
 
 		writeJSON(w, http.StatusOK, map[string]string{"state": "ok"})
 	})

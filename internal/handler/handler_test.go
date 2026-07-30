@@ -389,3 +389,13 @@ func TestStateNoSubscriptions(t *testing.T) {
 		t.End()
 	})
 }
+
+func TestRenewFail(t *testing.T) {
+	tape.Test(t, "handler: POST /renew with success=false returns 200", func(t *tape.T) {
+		h := newHandler(t.TB())
+		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
+		w := post(h, "/renew", map[string]any{"msisdn": "111", "service_id": "svc1", "success": false})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}

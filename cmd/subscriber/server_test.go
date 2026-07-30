@@ -130,3 +130,15 @@ func TestRunUnknownFlag(t *testing.T) {
 		t.End()
 	})
 }
+
+func TestRunBadPort(t *testing.T) {
+	tape.Test(t, "server: run with bad port returns 1", func(t *tape.T) {
+		oldArgs := os.Args
+		defer func() { os.Args = oldArgs }()
+		os.Args = []string{"subscriber"}
+		t.TB().Setenv("PORT", "99999")
+		code := run()
+		t.Ok(code == 1)
+		t.End()
+	})
+}
