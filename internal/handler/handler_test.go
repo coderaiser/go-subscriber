@@ -152,7 +152,7 @@ func TestRetryOK(t *testing.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		post(h, "/charge-result", map[string]any{
-			"msisdn": "111", "service_id": "svc1", "result": engine.ResultPermanent,
+			"msisdn": "111", "service_id": "svc1", "result": engine.ResultSubscriberState,
 		})
 		w := post(h, "/retry", map[string]any{"msisdn": "111", "service_id": "svc1", "success": true})
 		t.Ok(w.Code == http.StatusOK)
@@ -165,7 +165,7 @@ func TestKickOutOK(t *testing.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		post(h, "/charge-result", map[string]any{
-			"msisdn": "111", "service_id": "svc1", "result": engine.ResultPermanent,
+			"msisdn": "111", "service_id": "svc1", "result": engine.ResultSubscriberState,
 		})
 		w := post(h, "/kick-out", map[string]any{"msisdn": "111", "service_id": "svc1"})
 		t.Ok(w.Code == http.StatusOK)

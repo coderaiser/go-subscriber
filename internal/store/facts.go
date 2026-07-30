@@ -7,6 +7,7 @@ type Facts struct {
 	CooloffUntil    int64 // unix seconds; 0 = no cooloff
 	FallbackAttempt int   // low_balance ladder counter; reset on success
 	TrialUsed       bool  // one trial per (msisdn, serviceID), permanent
+	PermanentFail   bool  // carrier said this subscriber can never be charged
 }
 
 // FactsStore is owned by the engine only.

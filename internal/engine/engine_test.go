@@ -104,8 +104,8 @@ func TestUnsubscribeFromTrial(t *testing.T) {
 func TestUnsubscribeFromSuspended(t *testing.T) {
 	Test.Test(t, "engine: unsubscribe from suspended sets terminated", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
-		eng.Subscribe("111", "svc1", false)
-		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
+		eng.Subscribe("111", "svc1", false, engine.ResultSuccess)
+		eng.OnChargeResult("111", "svc1", engine.ResultSubscriberState)
 		state := eng.Unsubscribe("111", "svc1")
 		t.Ok(state == engine.StateTerminated)
 		t.End()
@@ -264,8 +264,8 @@ func TestExpireTrialUnknown(t *testing.T) {
 func TestRetrySuccess(t *testing.T) {
 	Test.Test(t, "engine: retry success sets active", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
-		eng.Subscribe("111", "svc1", false)
-		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
+		eng.Subscribe("111", "svc1", false, engine.ResultSuccess)
+		eng.OnChargeResult("111", "svc1", engine.ResultSubscriberState)
 		state := eng.Retry("111", "svc1", true)
 		t.Ok(state == engine.StateActive)
 		t.End()
@@ -275,8 +275,8 @@ func TestRetrySuccess(t *testing.T) {
 func TestRetryFail(t *testing.T) {
 	Test.Test(t, "engine: retry fail moves to removed", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
-		eng.Subscribe("111", "svc1", false)
-		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
+		eng.Subscribe("111", "svc1", false, engine.ResultSuccess)
+		eng.OnChargeResult("111", "svc1", engine.ResultSubscriberState)
 		state := eng.Retry("111", "svc1", false)
 		t.Ok(state == engine.StateRemoved)
 		t.End()
@@ -305,8 +305,8 @@ func TestRetryUnknown(t *testing.T) {
 func TestKickOut(t *testing.T) {
 	Test.Test(t, "engine: kick_out moves suspended to removed", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
-		eng.Subscribe("111", "svc1", false)
-		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
+		eng.Subscribe("111", "svc1", false, engine.ResultSuccess)
+		eng.OnChargeResult("111", "svc1", engine.ResultSubscriberState)
 		state := eng.KickOut("111", "svc1")
 		t.Ok(state == engine.StateRemoved)
 		t.End()
@@ -316,7 +316,7 @@ func TestKickOut(t *testing.T) {
 func TestKickOutNotSuspended(t *testing.T) {
 	Test.Test(t, "engine: kick_out on non-suspended returns empty", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
-		eng.Subscribe("111", "svc1", false)
+		eng.Subscribe("111", "svc1", false, engine.ResultSuccess)
 		state := eng.KickOut("111", "svc1")
 		t.Ok(state == "")
 		t.End()
@@ -410,6 +410,41 @@ func TestSubscribePaidLowBalanceThreeTimes(t *testing.T) {
 		ptr, _ := ss.Get("111:svc1")
 		t.Ok(ptr != nil)
 		t.Equal(*ptr, engine.StateSuspended)
+		t.End()
+	})
+}
+
+func TestChargePermanentSetsPermanentFail(t *testing.T) {
+	Test.Test(t, "engine: permanent failure sets PermanentFail flag (verify via Retry being blocked)", func(t *Test.T) {
+		eng := newEngine(t.TB(), fixed(epoch))
+		eng.Subscribe("111", "svc1", false, engine.ResultSuccess)
+		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
+		facts := eng.Facts().Get("111:svc1")
+		t.Ok(facts.PermanentFail)
+		t.End()
+	})
+}
+
+func TestChargeSubscriberStateDoesNotSetPermanentFail(t *testing.T) {
+	Test.Test(t, "engine: subscriber_state does not set PermanentFail (retry still works)", func(t *Test.T) {
+		eng := newEngine(t.TB(), fixed(epoch))
+		eng.Subscribe("111", "svc1", false, engine.ResultSuccess)
+		eng.OnChargeResult("111", "svc1", engine.ResultSubscriberState)
+		facts := eng.Facts().Get("111:svc1")
+		t.Ok(!facts.PermanentFail)
+		state := eng.Retry("111", "svc1", true)
+		t.Ok(state == engine.StateActive)
+		t.End()
+	})
+}
+
+func TestPermanentFailBlocksRetry(t *testing.T) {
+	Test.Test(t, "engine: permanent failure blocks retry", func(t *Test.T) {
+		eng := newEngine(t.TB(), fixed(epoch))
+		eng.Subscribe("111", "svc1", false, engine.ResultSuccess)
+		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
+		state := eng.Retry("111", "svc1", true)
+		t.Ok(state != engine.StateActive)
 		t.End()
 	})
 }

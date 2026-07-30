@@ -173,7 +173,13 @@ func (e *Engine) OnChargeResult(msisdn, serviceID string, result ChargeResult) S
 		e.facts.Set(id, facts)
 		next, _ := e.machine.Apply(id, EventRenewFail, nil)
 		return next
-	case ResultPermanent, ResultSubscriberState:
+	case ResultPermanent:
+		facts := e.facts.Get(id)
+		facts.PermanentFail = true
+		e.facts.Set(id, facts)
+		next, _ := e.machine.Apply(id, EventRenewFail, nil)
+		return next
+	case ResultSubscriberState:
 		next, _ := e.machine.Apply(id, EventRenewFail, nil)
 		return next
 	case ResultRateLimit, ResultSystemError, ResultPending, ResultNoResponse:
@@ -206,6 +212,11 @@ func (e *Engine) Retry(msisdn, serviceID string, success bool) State {
 	state := e.getState(id)
 	if state != StateSuspended {
 		return ""
+	}
+
+	facts := e.facts.Get(id)
+	if facts.PermanentFail {
+		return state // no-op; permanent failure cannot be retried
 	}
 
 	var event string
