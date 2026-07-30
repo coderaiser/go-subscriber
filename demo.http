@@ -1,0 +1,121 @@
+### Scenario 1 — trial lifecycle
+
+### 1. Subscribe (trial)
+POST http://localhost:8080/subscribe
+Content-Type: application/json
+
+{"msisdn": "96478001", "service_id": "quiz-daily", "trial": true}
+
+###
+
+### 2. Expire trial (success) → active
+POST http://localhost:8080/expire-trial
+Content-Type: application/json
+
+{"msisdn": "96478001", "service_id": "quiz-daily", "success": true}
+
+###
+
+### 3. Low balance attempt 1
+POST http://localhost:8080/charge-result
+Content-Type: application/json
+
+{"msisdn": "96478001", "service_id": "quiz-daily", "result": "low_balance"}
+
+###
+
+### 4. Low balance attempt 2
+POST http://localhost:8080/charge-result
+Content-Type: application/json
+
+{"msisdn": "96478001", "service_id": "quiz-daily", "result": "low_balance"}
+
+###
+
+### 5. Low balance attempt 3 → suspended
+POST http://localhost:8080/charge-result
+Content-Type: application/json
+
+{"msisdn": "96478001", "service_id": "quiz-daily", "result": "low_balance"}
+
+###
+
+### 6. Retry (success) → active
+POST http://localhost:8080/retry
+Content-Type: application/json
+
+{"msisdn": "96478001", "service_id": "quiz-daily", "success": true}
+
+###
+
+### 7. Check state
+GET http://localhost:8080/state/96478001
+
+###
+
+### 8. Unsubscribe → terminated + cooloff
+POST http://localhost:8080/unsubscribe
+Content-Type: application/json
+
+{"msisdn": "96478001", "service_id": "quiz-daily"}
+
+###
+
+### Scenario 2 — cooloff rejection
+
+### 9. Subscribe during cooloff → 409
+POST http://localhost:8080/subscribe
+Content-Type: application/json
+
+{"msisdn": "96478001", "service_id": "quiz-daily", "trial": false}
+
+###
+
+### Scenario 3 — paid → kick out
+
+### 10. Subscribe paid → active
+POST http://localhost:8080/subscribe
+Content-Type: application/json
+
+{"msisdn": "96478002", "service_id": "sports-alerts", "trial": false}
+
+###
+
+### 11. Permanent failure → suspended
+POST http://localhost:8080/charge-result
+Content-Type: application/json
+
+{"msisdn": "96478002", "service_id": "sports-alerts", "result": "permanent"}
+
+###
+
+### 12. Kick out → removed
+POST http://localhost:8080/kick-out
+Content-Type: application/json
+
+{"msisdn": "96478002", "service_id": "sports-alerts"}
+
+###
+
+### 13. Check final state
+GET http://localhost:8080/state/96478002
+
+###
+
+### Scenario 4 — stubs
+
+### 14. send-mt stub
+POST http://localhost:8080/send-mt
+Content-Type: application/json
+
+{"msisdn": "96478001", "message": "Welcome!"}
+
+###
+
+### Health
+GET http://localhost:8080/healthz
+
+###
+
+### Ready
+GET http://localhost:8080/readyz
