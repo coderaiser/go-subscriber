@@ -331,3 +331,37 @@ func TestKickOutUnknown(t *testing.T) {
 		t.End()
 	})
 }
+
+func TestSubscribeTrialTwice(t *testing.T) {
+	Test.Test(t, "engine: second trial is rejected after first", func(t *Test.T) {
+		eng := newEngine(t.TB(), fixed(epoch))
+		err := eng.Subscribe("111", "svc1", true)
+		t.NoError(err)
+		err = eng.Subscribe("111", "svc1", true)
+		t.Error(err)
+		t.End()
+	})
+}
+
+func TestSubscribeTrialAfterTerminate(t *testing.T) {
+	Test.Test(t, "engine: trial is rejected after terminate and re-subscribe", func(t *Test.T) {
+		eng := newEngine(t.TB(), fixed(epoch))
+		eng.Subscribe("111", "svc1", true)
+		eng.Unsubscribe("111", "svc1")
+		err := eng.Subscribe("111", "svc1", true)
+		t.Error(err)
+		t.End()
+	})
+}
+
+func TestTrialUsedFlagSurvivesUnsubscribe(t *testing.T) {
+	Test.Test(t, "engine: TrialUsed flag survives unsubscribe", func(t *Test.T) {
+		eng := newEngine(t.TB(), fixed(epoch))
+		eng.Subscribe("111", "svc1", true)
+		eng.Unsubscribe("111", "svc1")
+		fs := eng.Facts()
+		facts := fs.Get("111:svc1")
+		t.Ok(facts.TrialUsed)
+		t.End()
+	})
+}

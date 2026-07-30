@@ -13,6 +13,7 @@ import (
 var (
 	ErrAlreadySubscribed = errors.New("already subscribed")
 	ErrCooloff           = errors.New("cooloff period active")
+	ErrTrialAlreadyUsed  = errors.New("trial already used")
 )
 
 // Engine holds business logic for subscription lifecycle.
@@ -89,6 +90,12 @@ func (e *Engine) Subscribe(msisdn, serviceID string, trial bool) error {
 	}
 
 	if trial {
+		facts := e.facts.Get(id)
+		if facts.TrialUsed {
+			return ErrTrialAlreadyUsed
+		}
+		facts.TrialUsed = true
+		e.facts.Set(id, facts)
 		return e.states.Set(id, StateTrial)
 	}
 	return e.states.Set(id, StateActive)
@@ -102,7 +109,9 @@ func (e *Engine) Unsubscribe(msisdn, serviceID string) State {
 		return StateTerminated
 	}
 
-	e.facts.Set(id, store.Facts{CooloffUntil: e.now().AddDate(0, 0, CooloffDays).Unix()})
+	facts := e.facts.Get(id)
+	facts.CooloffUntil = e.now().AddDate(0, 0, CooloffDays).Unix()
+	e.facts.Set(id, facts)
 
 	next, err := e.machine.Apply(id, EventUnsubscribe, nil)
 	if err != nil {
@@ -121,7 +130,9 @@ func (e *Engine) OnChargeResult(msisdn, serviceID string, result ChargeResult) S
 
 	switch result {
 	case ResultSuccess:
-		e.facts.Set(id, store.Facts{FallbackAttempt: 0})
+		facts := e.facts.Get(id)
+		facts.FallbackAttempt = 0
+		e.facts.Set(id, facts)
 		next, _ := e.machine.Apply(id, EventRenewSuccess, nil)
 		return next
 	case ResultLowBalance:
@@ -191,3 +202,7 @@ func (e *Engine) KickOut(msisdn, serviceID string) State {
 	next, _ := e.machine.Apply(id, EventKickOut, nil)
 	return next
 }
+
+// Facts returns the FactsStore for direct access in tests.
+func (e *Engine) Facts() *store.FactsStore { return e.facts }
+

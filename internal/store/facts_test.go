@@ -46,3 +46,22 @@ func TestFactsOverwrite(t *testing.T) {
 		t.End()
 	})
 }
+
+func TestFactsTrialUsedDefault(t *testing.T) {
+	Test.Test(t, "store/facts: TrialUsed defaults to false", func(t *Test.T) {
+		f := store.NewFactsStore()
+		facts := f.Get("k")
+		t.Ok(!facts.TrialUsed)
+		t.End()
+	})
+}
+
+func TestFactsSetAndGetTrialUsed(t *testing.T) {
+	Test.Test(t, "store/facts: Set then Get returns TrialUsed", func(t *Test.T) {
+		f := store.NewFactsStore()
+		f.Set("k", store.Facts{TrialUsed: true})
+		facts := f.Get("k")
+		t.Ok(facts.TrialUsed)
+		t.End()
+	})
+}
