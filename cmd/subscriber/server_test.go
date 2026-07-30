@@ -78,8 +78,7 @@ func TestIoDiscardWrite(t *testing.T) {
 	tape.Test(t, "server: ioDiscard.Write returns len and no error", func(t *tape.T) {
 		d := ioDiscard{}
 		n, err := d.Write([]byte("hello"))
-		t.Ok(n == 5)
-		t.Ok(err == nil)
+		t.Ok(n == 5 && err == nil)
 		t.End()
 	})
 }
