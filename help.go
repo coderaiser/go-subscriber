@@ -1,39 +1,38 @@
-package coverage
+package main
 
 import (
+	_ "embed"
+	"encoding/json"
 	"fmt"
 	"strings"
-
-	"github.com/BurntSushi/toml"
 )
 
+//go:embed help.json
+var helpJSONBytes []byte
+
 type helpConfig struct {
-	Flags map[string]string `toml:"flags"`
-	Env   map[string]string `toml:"env"`
+	Flags     map[string]string `json:"flags"`
+	Env       map[string]string `json:"env"`
+	FlagOrder []string          `json:"flagOrder"`
+	EnvOrder  []string          `json:"envOrder"`
 }
 
+// Help returns the formatted help string for the subscriber binary.
 func Help() string {
-	return HelpFromTOML(helpTOMLBytes)
+	return HelpFromJSON(helpJSONBytes)
 }
 
-func HelpFromTOML(data []byte) string {
+// HelpFromJSON parses help config from JSON bytes and formats it.
+func HelpFromJSON(data []byte) string {
 	var cfg helpConfig
-
-	if err := toml.Unmarshal(data, &cfg); err != nil {
-		return "usage: coverage [options]\n(help unavailable)"
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		return "usage: subscriber [options]\n(help unavailable)\n"
 	}
 
 	var b strings.Builder
-	b.WriteString("usage: go-coverage [options]\n\nflags:\n")
+	b.WriteString("usage: subscriber [options]\n\nflags:\n")
 
-	flagOrder := []string{
-		"-f",
-		"--code-frame",
-		"-v, --version",
-		"-h, --help",
-	}
-
-	for _, flag := range flagOrder {
+	for _, flag := range cfg.FlagOrder {
 		if desc, ok := cfg.Flags[flag]; ok {
 			fmt.Fprintf(&b, "  %-22s %s\n", flag, desc)
 		}
@@ -41,9 +40,7 @@ func HelpFromTOML(data []byte) string {
 
 	if len(cfg.Env) > 0 {
 		b.WriteString("\nenvironment variables:\n")
-		envOrder := []string{"COVERAGE=codeframe", "COVERAGE=lines"}
-
-		for _, key := range envOrder {
+		for _, key := range cfg.EnvOrder {
 			if desc, ok := cfg.Env[key]; ok {
 				fmt.Fprintf(&b, "  %-22s %s\n", key, desc)
 			}

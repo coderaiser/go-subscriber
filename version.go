@@ -1,16 +1,20 @@
-package coverage
+package main
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 )
 
-// Version returns the version string embedded from package.json at build time.
-func VersionFromJSON(packageJSONBytes []byte) string {
+//go:embed package.json
+var packageJSONBytes []byte
+
+// VersionFromJSON parses the version field from package.json bytes.
+func VersionFromJSON(data []byte) string {
 	var pkg struct {
 		Version string `json:"version"`
 	}
-	if err := json.Unmarshal(packageJSONBytes, &pkg); err != nil {
+	if err := json.Unmarshal(data, &pkg); err != nil {
 		return "unknown"
 	}
 	if pkg.Version == "" {
@@ -19,11 +23,12 @@ func VersionFromJSON(packageJSONBytes []byte) string {
 	return pkg.Version
 }
 
+// Version returns the version embedded from package.json at build time.
 func Version() string {
 	return VersionFromJSON(packageJSONBytes)
 }
 
-// VersionLine returns "go-coverage x.y.z" for -v output.
+// VersionLine returns "vX.Y.Z" for -v/--version output.
 func VersionLine() string {
 	return fmt.Sprintf("v%s", Version())
 }

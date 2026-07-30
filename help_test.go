@@ -1,78 +1,59 @@
-package coverage_test
+package main
 
 import (
 	"strings"
 	"testing"
 
-	coverage "coderaiser/go-coverage"
-
 	tape "github.com/coderaiser/go-tape"
 )
 
-func TestHelp(t *testing.T) {
+func TestHelpContainsUsage(t *testing.T) {
 	tape.Test(t, "help: contains usage line", func(t *tape.T) {
-		result := coverage.Help()
-		t.Match(result, "usage: go-coverage [options]")
+		t.Match(Help(), "usage: subscriber")
 		t.End()
 	})
+}
 
-	tape.Test(t, "help: contains -f flag", func(t *tape.T) {
-		result := coverage.Help()
-		t.Match(result, "-f")
+func TestHelpContainsVersion(t *testing.T) {
+	tape.Test(t, "help: contains --version flag", func(t *tape.T) {
+		t.Match(Help(), "--version")
 		t.End()
 	})
+}
 
-	tape.Test(t, "help: contains --code-frame flag", func(t *tape.T) {
-		result := coverage.Help()
-		t.Match(result, "--code-frame")
-		t.End()
-	})
-
+func TestHelpContainsHelpFlag(t *testing.T) {
 	tape.Test(t, "help: contains --help flag", func(t *tape.T) {
-		result := coverage.Help()
-		t.Match(result, "--help")
+		t.Match(Help(), "--help")
 		t.End()
 	})
+}
 
+func TestHelpContainsEnvSection(t *testing.T) {
 	tape.Test(t, "help: contains environment variables section", func(t *tape.T) {
-		result := coverage.Help()
-		t.Match(result, "environment variables:")
+		t.Match(Help(), "environment variables:")
 		t.End()
 	})
+}
 
-	tape.Test(t, "help: contains COVERAGE=codeframe", func(t *tape.T) {
-		result := coverage.Help()
-		t.Match(result, "COVERAGE=codeframe")
+func TestHelpContainsPORT(t *testing.T) {
+	tape.Test(t, "help: contains PORT env var", func(t *tape.T) {
+		t.Match(Help(), "PORT")
 		t.End()
 	})
+}
 
-	tape.Test(t, "help: contains COVERAGE=lines", func(t *tape.T) {
-		result := coverage.Help()
-		t.Match(result, "COVERAGE=lines")
+func TestHelpVersionBeforeHelp(t *testing.T) {
+	tape.Test(t, "help: --version appears before --help", func(t *tape.T) {
+		result := Help()
+		t.Ok(strings.Index(result, "--version") < strings.Index(result, "--help"))
 		t.End()
 	})
+}
 
-	tape.Test(t, "help: -f appears before --code-frame", func(t *tape.T) {
-		result := coverage.Help()
-		t.Ok(strings.Index(result, "-f") < strings.Index(result, "--code-frame"))
-		t.End()
-	})
-
-	tape.Test(t, "help: --code-frame appears before -v", func(t *tape.T) {
-		result := coverage.Help()
-		t.Ok(strings.Index(result, "--code-frame") < strings.Index(result, "-v, --version"))
-		t.End()
-	})
-
-	tape.Test(t, "help: -v appears before -h", func(t *tape.T) {
-		result := coverage.Help()
-		t.Ok(strings.Index(result, "-v, --version") < strings.Index(result, "-h, --help"))
-		t.End()
-	})
-
-	tape.Test(t, "help: HelpFromTOML returns fallback on invalid TOML", func(t *tape.T) {
-		result := coverage.HelpFromTOML([]byte(`{invalid`))
-		t.Equal(result, "usage: coverage [options]\n(help unavailable)")
+func TestHelpFromJSONInvalid(t *testing.T) {
+	tape.Test(t, "help: HelpFromJSON returns fallback on invalid JSON", func(t *tape.T) {
+		result := HelpFromJSON([]byte(`{invalid`))
+		t.Equal(result, "usage: subscriber [options]\n(help unavailable)\n")
 		t.End()
 	})
 }
