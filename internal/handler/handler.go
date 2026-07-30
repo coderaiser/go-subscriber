@@ -229,6 +229,17 @@ func New(eng *engine.Engine, states *store.StateStore) http.Handler {
 		writeJSON(w, http.StatusOK, map[string]any{"status": "ok", "stub": true})
 	})
 
+
+	mux.HandleFunc("/status", statusStubHandler)
+	mux.HandleFunc("/services-history", servicesHistoryHandler)
+	mux.HandleFunc("/request-pin", stubHandler("sent", true))
+	mux.HandleFunc("/verify-pin", stubHandler("verified", true))
+	mux.HandleFunc("/one-time-payment", stubHandler("charged", true))
+	mux.HandleFunc("/forward-mo", stubHandler("forwarded", true))
+	mux.HandleFunc("/sync", stubHandler("synced", true))
+	mux.HandleFunc("/on-delivery-report", stubHandler("received", true))
+
+	
 	return mux
 }
 
@@ -237,4 +248,20 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(v)
 }
+
+// stubHandler returns an HTTP handler that responds with a static JSON stub.
+func stubHandler(key string, value any) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]any{key: value, "stub": true})
+	}
+}
+
+func statusStubHandler(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]any{"state": "active", "stub": true})
+}
+
+func servicesHistoryHandler(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]any{"services": []any{}, "stub": true})
+}
+
 

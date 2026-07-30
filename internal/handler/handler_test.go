@@ -454,3 +454,77 @@ func TestSubscribeTrialAfterUnsubConflict(t *testing.T) {
 		t.End()
 	})
 }
+
+// ── Group A stubs ───────────────────────────────────────────────────────
+
+func TestStubStatus(t *testing.T) {
+	Test.Test(t, "handler: POST /status stub returns 200", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/status", map[string]any{})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}
+
+func TestStubServicesHistory(t *testing.T) {
+	Test.Test(t, "handler: POST /services-history stub returns 200", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/services-history", map[string]any{})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}
+
+func TestStubRequestPin(t *testing.T) {
+	Test.Test(t, "handler: POST /request-pin stub returns 200", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/request-pin", map[string]any{})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}
+
+func TestStubVerifyPin(t *testing.T) {
+	Test.Test(t, "handler: POST /verify-pin stub returns 200", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/verify-pin", map[string]any{})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}
+
+func TestStubOneTimePayment(t *testing.T) {
+	Test.Test(t, "handler: POST /one-time-payment stub returns 200", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/one-time-payment", map[string]any{})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}
+
+func TestStubForwardMO(t *testing.T) {
+	Test.Test(t, "handler: POST /forward-mo stub returns 200", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/forward-mo", map[string]any{})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}
+
+func TestStubSync(t *testing.T) {
+	Test.Test(t, "handler: POST /sync stub returns 200", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/sync", map[string]any{})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}
+
+func TestStubOnDeliveryReport(t *testing.T) {
+	Test.Test(t, "handler: POST /on-delivery-report stub returns 200", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/on-delivery-report", map[string]any{})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}
