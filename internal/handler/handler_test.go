@@ -399,3 +399,58 @@ func TestRenewFail(t *testing.T) {
 		t.End()
 	})
 }
+
+// ── /subscribe charge_result ─────────────────────────────────────────────
+
+func TestSubscribeChargeResultSuccess(t *testing.T) {
+	Test.Test(t, "handler: POST /subscribe with charge_result=success returns 200", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/subscribe", map[string]any{
+			"msisdn": "111", "service_id": "svc1", "trial": false,
+			"charge_result": engine.ResultSuccess,
+		})
+		t.Ok(w.Code == http.StatusOK)
+		t.End()
+	})
+}
+
+func TestSubscribeChargeResultLowBalance(t *testing.T) {
+	Test.Test(t, "handler: POST /subscribe with charge_result=low_balance returns 200 with charge_failed", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/subscribe", map[string]any{
+			"msisdn": "111", "service_id": "svc1", "trial": false,
+			"charge_result": engine.ResultLowBalance,
+		})
+		t.Ok(w.Code == http.StatusOK)
+		var resp map[string]string
+		json.NewDecoder(w.Body).Decode(&resp)
+		t.Equal(resp["state"], "charge_failed")
+		t.End()
+	})
+}
+
+func TestSubscribeChargeResultPermanent(t *testing.T) {
+	Test.Test(t, "handler: POST /subscribe with charge_result=permanent returns 200 with charge_failed", func(t *Test.T) {
+		h := newHandler(t.TB())
+		w := post(h, "/subscribe", map[string]any{
+			"msisdn": "111", "service_id": "svc1", "trial": false,
+			"charge_result": engine.ResultPermanent,
+		})
+		t.Ok(w.Code == http.StatusOK)
+		var resp map[string]string
+		json.NewDecoder(w.Body).Decode(&resp)
+		t.Equal(resp["state"], "charge_failed")
+		t.End()
+	})
+}
+
+func TestSubscribeTrialAfterUnsubConflict(t *testing.T) {
+	Test.Test(t, "handler: POST /subscribe trial after unsub returns 409", func(t *Test.T) {
+		h := newHandler(t.TB())
+		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": true})
+		post(h, "/unsubscribe", map[string]any{"msisdn": "111", "service_id": "svc1"})
+		w := post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": true})
+		t.Ok(w.Code == http.StatusConflict)
+		t.End()
+	})
+}

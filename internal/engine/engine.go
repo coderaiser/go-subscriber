@@ -14,6 +14,7 @@ var (
 	ErrAlreadySubscribed = errors.New("already subscribed")
 	ErrCooloff           = errors.New("cooloff period active")
 	ErrTrialAlreadyUsed  = errors.New("trial already used")
+	ErrChargeFailed      = errors.New("charge failed")
 )
 
 // Engine holds business logic for subscription lifecycle.
@@ -75,7 +76,13 @@ func (e *Engine) getState(id string) State {
 }
 
 // Subscribe creates a new subscription.
-func (e *Engine) Subscribe(msisdn, serviceID string, trial bool) error {
+// chargeResult is only used for paid (non-trial) subscriptions and determines
+// whether the state is created immediately. If trial is true, chargeResult is ignored.
+// The chargeResult field models a carrier charge attempt at subscribe time:
+// - "success" → state is created as active
+// - "low_balance" → fallback ladder logic, no state unless ladder exhausted
+// - any other failure → no state created, returns ErrChargeFailed
+func (e *Engine) Subscribe(msisdn, serviceID string, trial bool, chargeResult ...ChargeResult) error {
 	id := key(msisdn, serviceID)
 	s := e.getState(id)
 	if s == StateActive || s == StateTrial || s == StateSuspended {
@@ -90,7 +97,6 @@ func (e *Engine) Subscribe(msisdn, serviceID string, trial bool) error {
 	}
 
 	if trial {
-		facts := e.facts.Get(id)
 		if facts.TrialUsed {
 			return ErrTrialAlreadyUsed
 		}
@@ -98,7 +104,28 @@ func (e *Engine) Subscribe(msisdn, serviceID string, trial bool) error {
 		e.facts.Set(id, facts)
 		return e.states.Set(id, StateTrial)
 	}
-	return e.states.Set(id, StateActive)
+
+	// Paid subscribe: determine charge result, default to success
+	result := ResultSuccess
+	if len(chargeResult) > 0 {
+		result = chargeResult[0]
+	}
+
+	switch result {
+	case ResultSuccess:
+		return e.states.Set(id, StateActive)
+	case ResultLowBalance:
+		facts.FallbackAttempt++
+		e.facts.Set(id, facts)
+		if facts.FallbackAttempt < FallbackThreshold {
+			return ErrChargeFailed
+		}
+		facts.FallbackAttempt = 0
+		e.facts.Set(id, facts)
+		return e.states.Set(id, StateSuspended)
+	default:
+		return ErrChargeFailed
+	}
 }
 
 // Unsubscribe removes a subscription.
@@ -205,4 +232,7 @@ func (e *Engine) KickOut(msisdn, serviceID string) State {
 
 // Facts returns the FactsStore for direct access in tests.
 func (e *Engine) Facts() *store.FactsStore { return e.facts }
+
+// States returns the StateStore for direct access in tests.
+func (e *Engine) States() *store.StateStore { return e.states }
 

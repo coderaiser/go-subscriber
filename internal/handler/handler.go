@@ -19,18 +19,27 @@ func New(eng *engine.Engine, states *store.StateStore) http.Handler {
 		}
 
 		var body struct {
-			Msisdn    string `json:"msisdn"`
-			ServiceID string `json:"service_id"`
-			Trial     bool   `json:"trial"`
+			Msisdn       string `json:"msisdn"`
+			ServiceID    string `json:"service_id"`
+			Trial        bool   `json:"trial"`
+			ChargeResult string `json:"charge_result"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "bad request"})
 			return
 		}
 
-		err := eng.Subscribe(body.Msisdn, body.ServiceID, body.Trial)
-		if err == engine.ErrAlreadySubscribed || err == engine.ErrCooloff {
+		if body.ChargeResult == "" {
+			body.ChargeResult = engine.ResultSuccess
+		}
+
+		err := eng.Subscribe(body.Msisdn, body.ServiceID, body.Trial, body.ChargeResult)
+		if err == engine.ErrAlreadySubscribed || err == engine.ErrCooloff || err == engine.ErrTrialAlreadyUsed {
 			writeJSON(w, http.StatusConflict, map[string]string{"error": err.Error()})
+			return
+		}
+		if err == engine.ErrChargeFailed {
+			writeJSON(w, http.StatusOK, map[string]string{"state": "charge_failed"})
 			return
 		}
 

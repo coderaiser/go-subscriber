@@ -365,3 +365,51 @@ func TestTrialUsedFlagSurvivesUnsubscribe(t *testing.T) {
 		t.End()
 	})
 }
+
+func TestSubscribePaidWithSuccessResult(t *testing.T) {
+	Test.Test(t, "engine: paid subscribe with success result sets active", func(t *Test.T) {
+		eng := newEngine(t.TB(), fixed(epoch))
+		err := eng.Subscribe("111", "svc1", false, engine.ResultSuccess)
+		t.NoError(err)
+		ptr, _ := eng.States().Get("111:svc1")
+		t.Ok(ptr != nil)
+		t.Equal(*ptr, engine.StateActive)
+		t.End()
+	})
+}
+
+func TestSubscribePaidWithLowBalance(t *testing.T) {
+	Test.Test(t, "engine: paid subscribe with low_balance does not create state", func(t *Test.T) {
+		eng := newEngine(t.TB(), fixed(epoch))
+		err := eng.Subscribe("111", "svc1", false, engine.ResultLowBalance)
+		t.Error(err)
+		t.End()
+	})
+}
+
+func TestSubscribePaidWithPermanentFailure(t *testing.T) {
+	Test.Test(t, "engine: paid subscribe with permanent failure does not create state", func(t *Test.T) {
+		eng := newEngine(t.TB(), fixed(epoch))
+		err := eng.Subscribe("111", "svc1", false, engine.ResultPermanent)
+		t.Error(err)
+		t.End()
+	})
+}
+
+func TestSubscribePaidLowBalanceThreeTimes(t *testing.T) {
+	Test.Test(t, "engine: paid subscribe low_balance x3 suspends (ladder exhausted)", func(t *Test.T) {
+		ss := store.NewStateStore()
+		fs := store.NewFactsStore()
+		eng := engine.New(ss, fs, fixed(epoch), slog.Default())
+		err := eng.Subscribe("111", "svc1", false, engine.ResultLowBalance)
+		t.Error(err)
+		err = eng.Subscribe("111", "svc1", false, engine.ResultLowBalance)
+		t.Error(err)
+		err = eng.Subscribe("111", "svc1", false, engine.ResultLowBalance)
+		t.NoError(err)
+		ptr, _ := ss.Get("111:svc1")
+		t.Ok(ptr != nil)
+		t.Equal(*ptr, engine.StateSuspended)
+		t.End()
+	})
+}
