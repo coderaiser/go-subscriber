@@ -97,3 +97,36 @@ func TestServerHealthzIntegration(t *testing.T) {
 		t.End()
 	})
 }
+
+func TestRunVersionFlag(t *testing.T) {
+	tape.Test(t, "server: run with --version returns 0", func(t *tape.T) {
+		oldArgs := os.Args
+		defer func() { os.Args = oldArgs }()
+		os.Args = []string{"subscriber", "--version"}
+		code := run()
+		t.Ok(code == 0)
+		t.End()
+	})
+}
+
+func TestRunHelpFlag(t *testing.T) {
+	tape.Test(t, "server: run with --help returns 0", func(t *tape.T) {
+		oldArgs := os.Args
+		defer func() { os.Args = oldArgs }()
+		os.Args = []string{"subscriber", "--help"}
+		code := run()
+		t.Ok(code == 0)
+		t.End()
+	})
+}
+
+func TestRunUnknownFlag(t *testing.T) {
+	tape.Test(t, "server: run with unknown flag returns 1", func(t *tape.T) {
+		oldArgs := os.Args
+		defer func() { os.Args = oldArgs }()
+		os.Args = []string{"subscriber", "--bad"}
+		code := run()
+		t.Ok(code == 1)
+		t.End()
+	})
+}

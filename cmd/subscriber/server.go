@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
@@ -10,11 +11,21 @@ import (
 	"time"
 
 	"github.com/coderaiser/go-subscriber/internal/engine"
+	"github.com/coderaiser/go-subscriber/internal/flags"
+	"github.com/coderaiser/go-subscriber/internal/flags/meta"
 	"github.com/coderaiser/go-subscriber/internal/handler"
 	"github.com/coderaiser/go-subscriber/internal/store"
 )
 
 func run() int {
+	meta.Set(VersionLine, Help)
+
+	result := flags.Parse(os.Args[1:])
+	if result.ExitCode >= 0 {
+		fmt.Print(result.Output)
+		return result.ExitCode
+	}
+
 	log := newLogger()
 
 	port := os.Getenv("PORT")
