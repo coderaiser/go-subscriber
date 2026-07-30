@@ -9,11 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	tape "github.com/coderaiser/go-tape"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 )
 
 func TestHandleHealth(t *testing.T) {
-	tape.Test(t, "server: GET /healthz returns 200", func(t *tape.T) {
+	Test.Test(t, "server: GET /healthz returns 200", func(t *Test.T) {
 		req := httptest.NewRequest(http.MethodGet, "/healthz", nil)
 		w := httptest.NewRecorder()
 		handleHealth(w, req)
@@ -23,7 +23,7 @@ func TestHandleHealth(t *testing.T) {
 }
 
 func TestHandleReady(t *testing.T) {
-	tape.Test(t, "server: GET /readyz returns 200", func(t *tape.T) {
+	Test.Test(t, "server: GET /readyz returns 200", func(t *Test.T) {
 		req := httptest.NewRequest(http.MethodGet, "/readyz", nil)
 		w := httptest.NewRecorder()
 		handleReady(w, req)
@@ -33,7 +33,7 @@ func TestHandleReady(t *testing.T) {
 }
 
 func TestNewLoggerJSON(t *testing.T) {
-	tape.Test(t, "server: newLogger returns json logger when LOG_FORMAT=json", func(t *tape.T) {
+	Test.Test(t, "server: newLogger returns json logger when LOG_FORMAT=json", func(t *Test.T) {
 		t.TB().Setenv("LOG_FORMAT", "json")
 		t.Ok(newLogger() != nil)
 		t.End()
@@ -41,7 +41,7 @@ func TestNewLoggerJSON(t *testing.T) {
 }
 
 func TestNewLoggerText(t *testing.T) {
-	tape.Test(t, "server: newLogger returns text logger when LOG_FORMAT=text", func(t *tape.T) {
+	Test.Test(t, "server: newLogger returns text logger when LOG_FORMAT=text", func(t *Test.T) {
 		t.TB().Setenv("LOG_FORMAT", "text")
 		t.Ok(newLogger() != nil)
 		t.End()
@@ -49,7 +49,7 @@ func TestNewLoggerText(t *testing.T) {
 }
 
 func TestNewLoggerDefaultDev(t *testing.T) {
-	tape.Test(t, "server: newLogger defaults to text when no env set", func(t *tape.T) {
+	Test.Test(t, "server: newLogger defaults to text when no env set", func(t *Test.T) {
 		os.Unsetenv("LOG_FORMAT")
 		os.Unsetenv("PORT")
 		t.Ok(newLogger() != nil)
@@ -58,7 +58,7 @@ func TestNewLoggerDefaultDev(t *testing.T) {
 }
 
 func TestNewLoggerDefaultProd(t *testing.T) {
-	tape.Test(t, "server: newLogger defaults to json when PORT is set", func(t *tape.T) {
+	Test.Test(t, "server: newLogger defaults to json when PORT is set", func(t *Test.T) {
 		os.Unsetenv("LOG_FORMAT")
 		t.TB().Setenv("PORT", "9999")
 		t.Ok(newLogger() != nil)
@@ -67,7 +67,7 @@ func TestNewLoggerDefaultProd(t *testing.T) {
 }
 
 func TestServeBadPort(t *testing.T) {
-	tape.Test(t, "server: serve returns 1 for invalid port", func(t *tape.T) {
+	Test.Test(t, "server: serve returns 1 for invalid port", func(t *Test.T) {
 		code := serve("99999", newLogger())
 		t.Ok(code == 1)
 		t.End()
@@ -75,7 +75,7 @@ func TestServeBadPort(t *testing.T) {
 }
 
 func TestIoDiscardWrite(t *testing.T) {
-	tape.Test(t, "server: ioDiscard.Write returns len and no error", func(t *tape.T) {
+	Test.Test(t, "server: ioDiscard.Write returns len and no error", func(t *Test.T) {
 		d := ioDiscard{}
 		n, err := d.Write([]byte("hello"))
 		t.Ok(n == 5 && err == nil)
@@ -84,7 +84,7 @@ func TestIoDiscardWrite(t *testing.T) {
 }
 
 func TestServerHealthzIntegration(t *testing.T) {
-	tape.Test(t, "server: integration GET /healthz returns ok", func(t *tape.T) {
+	Test.Test(t, "server: integration GET /healthz returns ok", func(t *Test.T) {
 		base, cancel := startTestServer(context.Background())
 		defer cancel()
 		resp, err := http.Get(base + "/healthz")
@@ -99,7 +99,7 @@ func TestServerHealthzIntegration(t *testing.T) {
 }
 
 func TestRunVersionFlag(t *testing.T) {
-	tape.Test(t, "server: run with --version returns 0", func(t *tape.T) {
+	Test.Test(t, "server: run with --version returns 0", func(t *Test.T) {
 		oldArgs := os.Args
 		defer func() { os.Args = oldArgs }()
 		os.Args = []string{"subscriber", "--version"}
@@ -110,7 +110,7 @@ func TestRunVersionFlag(t *testing.T) {
 }
 
 func TestRunHelpFlag(t *testing.T) {
-	tape.Test(t, "server: run with --help returns 0", func(t *tape.T) {
+	Test.Test(t, "server: run with --help returns 0", func(t *Test.T) {
 		oldArgs := os.Args
 		defer func() { os.Args = oldArgs }()
 		os.Args = []string{"subscriber", "--help"}
@@ -121,7 +121,7 @@ func TestRunHelpFlag(t *testing.T) {
 }
 
 func TestRunUnknownFlag(t *testing.T) {
-	tape.Test(t, "server: run with unknown flag returns 1", func(t *tape.T) {
+	Test.Test(t, "server: run with unknown flag returns 1", func(t *Test.T) {
 		oldArgs := os.Args
 		defer func() { os.Args = oldArgs }()
 		os.Args = []string{"subscriber", "--bad"}
@@ -132,7 +132,7 @@ func TestRunUnknownFlag(t *testing.T) {
 }
 
 func TestRunBadPort(t *testing.T) {
-	tape.Test(t, "server: run with bad port returns 1", func(t *tape.T) {
+	Test.Test(t, "server: run with bad port returns 1", func(t *Test.T) {
 		oldArgs := os.Args
 		defer func() { os.Args = oldArgs }()
 		os.Args = []string{"subscriber"}

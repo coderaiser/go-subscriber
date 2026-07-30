@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	tape "github.com/coderaiser/go-tape"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/engine"
 	"github.com/coderaiser/go-subscriber/internal/store"
 )
@@ -29,7 +29,7 @@ var errCooloff = errors.New("cooloff")
 var errAlreadySubscribed = errors.New("already subscribed")
 
 func TestSubscribeTrial(t *testing.T) {
-	tape.Test(t, "engine: subscribe trial sets trial state", func(t *tape.T) {
+	Test.Test(t, "engine: subscribe trial sets trial state", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		err := eng.Subscribe("111", "svc1", true)
 		t.NoError(err)
@@ -38,7 +38,7 @@ func TestSubscribeTrial(t *testing.T) {
 }
 
 func TestSubscribePaid(t *testing.T) {
-	tape.Test(t, "engine: subscribe paid sets active state", func(t *tape.T) {
+	Test.Test(t, "engine: subscribe paid sets active state", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		err := eng.Subscribe("111", "svc1", false)
 		t.NoError(err)
@@ -47,7 +47,7 @@ func TestSubscribePaid(t *testing.T) {
 }
 
 func TestSubscribeAlreadySubscribed(t *testing.T) {
-	tape.Test(t, "engine: subscribe returns error when already subscribed", func(t *tape.T) {
+	Test.Test(t, "engine: subscribe returns error when already subscribed", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		err := eng.Subscribe("111", "svc1", false)
@@ -57,7 +57,7 @@ func TestSubscribeAlreadySubscribed(t *testing.T) {
 }
 
 func TestSubscribeCooloffActive(t *testing.T) {
-	tape.Test(t, "engine: subscribe returns cooloff error during cooloff", func(t *tape.T) {
+	Test.Test(t, "engine: subscribe returns cooloff error during cooloff", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		eng.Unsubscribe("111", "svc1")
@@ -68,7 +68,7 @@ func TestSubscribeCooloffActive(t *testing.T) {
 }
 
 func TestSubscribeAfterCooloff(t *testing.T) {
-	tape.Test(t, "engine: subscribe succeeds after cooloff expires", func(t *tape.T) {
+	Test.Test(t, "engine: subscribe succeeds after cooloff expires", func(t *Test.T) {
 		ss := store.NewStateStore()
 		fs := store.NewFactsStore()
 		eng := engine.New(ss, fs, fixed(epoch), slog.Default())
@@ -82,7 +82,7 @@ func TestSubscribeAfterCooloff(t *testing.T) {
 }
 
 func TestUnsubscribeFromActive(t *testing.T) {
-	tape.Test(t, "engine: unsubscribe from active sets terminated", func(t *tape.T) {
+	Test.Test(t, "engine: unsubscribe from active sets terminated", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.Unsubscribe("111", "svc1")
@@ -92,7 +92,7 @@ func TestUnsubscribeFromActive(t *testing.T) {
 }
 
 func TestUnsubscribeFromTrial(t *testing.T) {
-	tape.Test(t, "engine: unsubscribe from trial sets terminated", func(t *tape.T) {
+	Test.Test(t, "engine: unsubscribe from trial sets terminated", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", true)
 		state := eng.Unsubscribe("111", "svc1")
@@ -102,7 +102,7 @@ func TestUnsubscribeFromTrial(t *testing.T) {
 }
 
 func TestUnsubscribeFromSuspended(t *testing.T) {
-	tape.Test(t, "engine: unsubscribe from suspended sets terminated", func(t *tape.T) {
+	Test.Test(t, "engine: unsubscribe from suspended sets terminated", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
@@ -113,7 +113,7 @@ func TestUnsubscribeFromSuspended(t *testing.T) {
 }
 
 func TestUnsubscribeNoSubscription(t *testing.T) {
-	tape.Test(t, "engine: unsubscribe with no subscription does not panic", func(t *tape.T) {
+	Test.Test(t, "engine: unsubscribe with no subscription does not panic", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		state := eng.Unsubscribe("nobody", "svc1")
 		t.Ok(state == engine.StateTerminated)
@@ -122,7 +122,7 @@ func TestUnsubscribeNoSubscription(t *testing.T) {
 }
 
 func TestChargeSuccess(t *testing.T) {
-	tape.Test(t, "engine: charge success sets active", func(t *tape.T) {
+	Test.Test(t, "engine: charge success sets active", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.OnChargeResult("111", "svc1", engine.ResultSuccess)
@@ -132,7 +132,7 @@ func TestChargeSuccess(t *testing.T) {
 }
 
 func TestChargeLowBalanceBelowThreshold(t *testing.T) {
-	tape.Test(t, "engine: low balance below threshold keeps current state", func(t *tape.T) {
+	Test.Test(t, "engine: low balance below threshold keeps current state", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.OnChargeResult("111", "svc1", engine.ResultLowBalance)
@@ -142,7 +142,7 @@ func TestChargeLowBalanceBelowThreshold(t *testing.T) {
 }
 
 func TestChargeLowBalanceAtThreshold(t *testing.T) {
-	tape.Test(t, "engine: low balance at threshold suspends", func(t *tape.T) {
+	Test.Test(t, "engine: low balance at threshold suspends", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		eng.OnChargeResult("111", "svc1", engine.ResultLowBalance)
@@ -154,7 +154,7 @@ func TestChargeLowBalanceAtThreshold(t *testing.T) {
 }
 
 func TestChargePermanent(t *testing.T) {
-	tape.Test(t, "engine: permanent failure suspends", func(t *tape.T) {
+	Test.Test(t, "engine: permanent failure suspends", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
@@ -164,7 +164,7 @@ func TestChargePermanent(t *testing.T) {
 }
 
 func TestChargeRateLimit(t *testing.T) {
-	tape.Test(t, "engine: rate limit leaves state unchanged", func(t *tape.T) {
+	Test.Test(t, "engine: rate limit leaves state unchanged", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.OnChargeResult("111", "svc1", engine.ResultRateLimit)
@@ -174,7 +174,7 @@ func TestChargeRateLimit(t *testing.T) {
 }
 
 func TestChargeSystemError(t *testing.T) {
-	tape.Test(t, "engine: system error leaves state unchanged", func(t *tape.T) {
+	Test.Test(t, "engine: system error leaves state unchanged", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.OnChargeResult("111", "svc1", engine.ResultSystemError)
@@ -184,7 +184,7 @@ func TestChargeSystemError(t *testing.T) {
 }
 
 func TestChargePending(t *testing.T) {
-	tape.Test(t, "engine: pending leaves state unchanged", func(t *tape.T) {
+	Test.Test(t, "engine: pending leaves state unchanged", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.OnChargeResult("111", "svc1", engine.ResultPending)
@@ -194,7 +194,7 @@ func TestChargePending(t *testing.T) {
 }
 
 func TestChargeNoResponse(t *testing.T) {
-	tape.Test(t, "engine: no response leaves state unchanged", func(t *tape.T) {
+	Test.Test(t, "engine: no response leaves state unchanged", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.OnChargeResult("111", "svc1", engine.ResultNoResponse)
@@ -204,7 +204,7 @@ func TestChargeNoResponse(t *testing.T) {
 }
 
 func TestChargeSubscriberState(t *testing.T) {
-	tape.Test(t, "engine: subscriber_state result suspends", func(t *tape.T) {
+	Test.Test(t, "engine: subscriber_state result suspends", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.OnChargeResult("111", "svc1", engine.ResultSubscriberState)
@@ -214,7 +214,7 @@ func TestChargeSubscriberState(t *testing.T) {
 }
 
 func TestChargeUnknownSub(t *testing.T) {
-	tape.Test(t, "engine: charge result for unknown subscription returns empty", func(t *tape.T) {
+	Test.Test(t, "engine: charge result for unknown subscription returns empty", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		state := eng.OnChargeResult("nobody", "svc1", engine.ResultSuccess)
 		t.Ok(state == "")
@@ -223,7 +223,7 @@ func TestChargeUnknownSub(t *testing.T) {
 }
 
 func TestExpireTrialSuccess(t *testing.T) {
-	tape.Test(t, "engine: expire trial success sets active", func(t *tape.T) {
+	Test.Test(t, "engine: expire trial success sets active", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", true)
 		state := eng.ExpireTrial("111", "svc1", true)
@@ -233,7 +233,7 @@ func TestExpireTrialSuccess(t *testing.T) {
 }
 
 func TestExpireTrialFail(t *testing.T) {
-	tape.Test(t, "engine: expire trial fail suspends", func(t *tape.T) {
+	Test.Test(t, "engine: expire trial fail suspends", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", true)
 		state := eng.ExpireTrial("111", "svc1", false)
@@ -243,7 +243,7 @@ func TestExpireTrialFail(t *testing.T) {
 }
 
 func TestExpireTrialNotInTrial(t *testing.T) {
-	tape.Test(t, "engine: expire trial on non-trial returns empty", func(t *tape.T) {
+	Test.Test(t, "engine: expire trial on non-trial returns empty", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.ExpireTrial("111", "svc1", true)
@@ -253,7 +253,7 @@ func TestExpireTrialNotInTrial(t *testing.T) {
 }
 
 func TestExpireTrialUnknown(t *testing.T) {
-	tape.Test(t, "engine: expire trial for unknown returns empty", func(t *tape.T) {
+	Test.Test(t, "engine: expire trial for unknown returns empty", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		state := eng.ExpireTrial("nobody", "svc1", true)
 		t.Ok(state == "")
@@ -262,7 +262,7 @@ func TestExpireTrialUnknown(t *testing.T) {
 }
 
 func TestRetrySuccess(t *testing.T) {
-	tape.Test(t, "engine: retry success sets active", func(t *tape.T) {
+	Test.Test(t, "engine: retry success sets active", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
@@ -273,7 +273,7 @@ func TestRetrySuccess(t *testing.T) {
 }
 
 func TestRetryFail(t *testing.T) {
-	tape.Test(t, "engine: retry fail moves to removed", func(t *tape.T) {
+	Test.Test(t, "engine: retry fail moves to removed", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
@@ -284,7 +284,7 @@ func TestRetryFail(t *testing.T) {
 }
 
 func TestRetryNotSuspended(t *testing.T) {
-	tape.Test(t, "engine: retry on non-suspended returns empty", func(t *tape.T) {
+	Test.Test(t, "engine: retry on non-suspended returns empty", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.Retry("111", "svc1", true)
@@ -294,7 +294,7 @@ func TestRetryNotSuspended(t *testing.T) {
 }
 
 func TestRetryUnknown(t *testing.T) {
-	tape.Test(t, "engine: retry for unknown returns empty", func(t *tape.T) {
+	Test.Test(t, "engine: retry for unknown returns empty", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		state := eng.Retry("nobody", "svc1", true)
 		t.Ok(state == "")
@@ -303,7 +303,7 @@ func TestRetryUnknown(t *testing.T) {
 }
 
 func TestKickOut(t *testing.T) {
-	tape.Test(t, "engine: kick_out moves suspended to removed", func(t *tape.T) {
+	Test.Test(t, "engine: kick_out moves suspended to removed", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		eng.OnChargeResult("111", "svc1", engine.ResultPermanent)
@@ -314,7 +314,7 @@ func TestKickOut(t *testing.T) {
 }
 
 func TestKickOutNotSuspended(t *testing.T) {
-	tape.Test(t, "engine: kick_out on non-suspended returns empty", func(t *tape.T) {
+	Test.Test(t, "engine: kick_out on non-suspended returns empty", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		eng.Subscribe("111", "svc1", false)
 		state := eng.KickOut("111", "svc1")
@@ -324,7 +324,7 @@ func TestKickOutNotSuspended(t *testing.T) {
 }
 
 func TestKickOutUnknown(t *testing.T) {
-	tape.Test(t, "engine: kick_out for unknown returns empty", func(t *tape.T) {
+	Test.Test(t, "engine: kick_out for unknown returns empty", func(t *Test.T) {
 		eng := newEngine(t.TB(), fixed(epoch))
 		state := eng.KickOut("nobody", "svc1")
 		t.Ok(state == "")

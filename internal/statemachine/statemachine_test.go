@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	tape "github.com/coderaiser/go-tape"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/statemachine"
 )
 
@@ -65,7 +65,7 @@ func newMachine(t *testing.T) *statemachine.Machine[state, event] {
 }
 
 func TestMachineValidTransition(t *testing.T) {
-	tape.Test(t, "statemachine: valid transition returns next state", func(t *tape.T) {
+	Test.Test(t, "statemachine: valid transition returns next state", func(t *Test.T) {
 		m := newMachine(t.TB())
 		_, err := m.Apply("e1", eventRun, nil)
 		t.NoError(err)
@@ -74,7 +74,7 @@ func TestMachineValidTransition(t *testing.T) {
 }
 
 func TestMachineStoresState(t *testing.T) {
-	tape.Test(t, "statemachine: state is persisted after Apply", func(t *tape.T) {
+	Test.Test(t, "statemachine: state is persisted after Apply", func(t *Test.T) {
 		mem := statemachine.NewMemory[state]()
 		src := &statemachine.MemorySource{
 			Defs: []statemachine.TransitionDef{
@@ -90,7 +90,7 @@ func TestMachineStoresState(t *testing.T) {
 }
 
 func TestMachineStoresStateValue(t *testing.T) {
-	tape.Test(t, "statemachine: stored state matches running", func(t *tape.T) {
+	Test.Test(t, "statemachine: stored state matches running", func(t *Test.T) {
 		mem := statemachine.NewMemory[state]()
 		src := &statemachine.MemorySource{
 			Defs: []statemachine.TransitionDef{
@@ -106,7 +106,7 @@ func TestMachineStoresStateValue(t *testing.T) {
 }
 
 func TestMachineInvalidTransitionNonStrict(t *testing.T) {
-	tape.Test(t, "statemachine: invalid transition returns error in non-strict mode", func(t *tape.T) {
+	Test.Test(t, "statemachine: invalid transition returns error in non-strict mode", func(t *Test.T) {
 		m := newMachine(t.TB())
 		_, err := m.Apply("e1", eventFinish, nil)
 		t.Error(err)
@@ -115,7 +115,7 @@ func TestMachineInvalidTransitionNonStrict(t *testing.T) {
 }
 
 func TestMachineInvalidTransitionStrict(t *testing.T) {
-	tape.Test(t, "statemachine: invalid transition panics in strict mode", func(t *tape.T) {
+	Test.Test(t, "statemachine: invalid transition panics in strict mode", func(t *Test.T) {
 		src := &statemachine.MemorySource{
 			Defs: []statemachine.TransitionDef{
 				{From: "idle", Event: "run", To: "running"},
@@ -131,7 +131,7 @@ func TestMachineInvalidTransitionStrict(t *testing.T) {
 }
 
 func TestMachineHookCalled(t *testing.T) {
-	tape.Test(t, "statemachine: hook is called after transition", func(t *tape.T) {
+	Test.Test(t, "statemachine: hook is called after transition", func(t *Test.T) {
 		m := newMachine(t.TB())
 		called := false
 		m.Hook(stateIdle, eventRun, func(ctx statemachine.Context[state, event]) error {
@@ -145,7 +145,7 @@ func TestMachineHookCalled(t *testing.T) {
 }
 
 func TestMachineHookError(t *testing.T) {
-	tape.Test(t, "statemachine: hook error is returned", func(t *tape.T) {
+	Test.Test(t, "statemachine: hook error is returned", func(t *Test.T) {
 		m := newMachine(t.TB())
 		m.Hook(stateIdle, eventRun, func(ctx statemachine.Context[state, event]) error {
 			return errors.New("hook failed")
@@ -157,7 +157,7 @@ func TestMachineHookError(t *testing.T) {
 }
 
 func TestMachineWithInitialNoError(t *testing.T) {
-	tape.Test(t, "statemachine: WithInitial allows Apply for unknown id", func(t *tape.T) {
+	Test.Test(t, "statemachine: WithInitial allows Apply for unknown id", func(t *Test.T) {
 		m := newMachine(t.TB())
 		m.WithInitial(stateIdle)
 		_, err := m.Apply("brand-new", eventRun, nil)
@@ -167,7 +167,7 @@ func TestMachineWithInitialNoError(t *testing.T) {
 }
 
 func TestMachineValidate(t *testing.T) {
-	tape.Test(t, "statemachine: Validate passes for valid machine", func(t *tape.T) {
+	Test.Test(t, "statemachine: Validate passes for valid machine", func(t *Test.T) {
 		m := newMachine(t.TB())
 		t.NoError(m.Validate())
 		t.End()
@@ -175,7 +175,7 @@ func TestMachineValidate(t *testing.T) {
 }
 
 func TestMachineValidateEmpty(t *testing.T) {
-	tape.Test(t, "statemachine: Validate fails for state with no transitions", func(t *tape.T) {
+	Test.Test(t, "statemachine: Validate fails for state with no transitions", func(t *Test.T) {
 		m := &statemachine.Machine[state, event]{}
 		m.SetTransitions(map[state]map[event]state{
 			stateIdle: {},
@@ -186,7 +186,7 @@ func TestMachineValidateEmpty(t *testing.T) {
 }
 
 func TestMemoryGetMissingReturnsNil(t *testing.T) {
-	tape.Test(t, "statemachine: Memory.Get returns nil for unknown id", func(t *tape.T) {
+	Test.Test(t, "statemachine: Memory.Get returns nil for unknown id", func(t *Test.T) {
 		mem := statemachine.NewMemory[state]()
 		ptr, _ := mem.Get("unknown")
 		t.Ok(ptr == nil)
@@ -195,7 +195,7 @@ func TestMemoryGetMissingReturnsNil(t *testing.T) {
 }
 
 func TestMemorySetAndGetNoError(t *testing.T) {
-	tape.Test(t, "statemachine: Memory.Set does not error", func(t *tape.T) {
+	Test.Test(t, "statemachine: Memory.Set does not error", func(t *Test.T) {
 		mem := statemachine.NewMemory[state]()
 		err := mem.Set("e1", stateRunning)
 		t.NoError(err)
@@ -204,7 +204,7 @@ func TestMemorySetAndGetNoError(t *testing.T) {
 }
 
 func TestMemorySetAndGetCorrectValue(t *testing.T) {
-	tape.Test(t, "statemachine: Memory.Get returns what was Set", func(t *tape.T) {
+	Test.Test(t, "statemachine: Memory.Get returns what was Set", func(t *Test.T) {
 		mem := statemachine.NewMemory[state]()
 		mem.Set("e1", stateRunning)
 		ptr, _ := mem.Get("e1")
@@ -214,7 +214,7 @@ func TestMemorySetAndGetCorrectValue(t *testing.T) {
 }
 
 func TestNewWithBadFromState(t *testing.T) {
-	tape.Test(t, "statemachine: New returns error for unknown From state", func(t *tape.T) {
+	Test.Test(t, "statemachine: New returns error for unknown From state", func(t *Test.T) {
 		src := &statemachine.MemorySource{
 			Defs: []statemachine.TransitionDef{
 				{From: "bad", Event: "run", To: "running"},
@@ -227,7 +227,7 @@ func TestNewWithBadFromState(t *testing.T) {
 }
 
 func TestNewWithBadEvent(t *testing.T) {
-	tape.Test(t, "statemachine: New returns error for unknown Event", func(t *tape.T) {
+	Test.Test(t, "statemachine: New returns error for unknown Event", func(t *Test.T) {
 		src := &statemachine.MemorySource{
 			Defs: []statemachine.TransitionDef{
 				{From: "idle", Event: "bad", To: "running"},
@@ -240,7 +240,7 @@ func TestNewWithBadEvent(t *testing.T) {
 }
 
 func TestNewWithBadToState(t *testing.T) {
-	tape.Test(t, "statemachine: New returns error for unknown To state", func(t *tape.T) {
+	Test.Test(t, "statemachine: New returns error for unknown To state", func(t *Test.T) {
 		src := &statemachine.MemorySource{
 			Defs: []statemachine.TransitionDef{
 				{From: "idle", Event: "run", To: "bad"},
@@ -253,7 +253,7 @@ func TestNewWithBadToState(t *testing.T) {
 }
 
 func TestAdapterGetError(t *testing.T) {
-	tape.Test(t, "statemachine: Apply returns error when adapter.Get fails", func(t *tape.T) {
+	Test.Test(t, "statemachine: Apply returns error when adapter.Get fails", func(t *Test.T) {
 		src := &statemachine.MemorySource{
 			Defs: []statemachine.TransitionDef{
 				{From: "idle", Event: "run", To: "running"},
@@ -267,7 +267,7 @@ func TestAdapterGetError(t *testing.T) {
 }
 
 func TestAdapterSetError(t *testing.T) {
-	tape.Test(t, "statemachine: Apply returns error when adapter.Set fails", func(t *tape.T) {
+	Test.Test(t, "statemachine: Apply returns error when adapter.Set fails", func(t *Test.T) {
 		src := &statemachine.MemorySource{
 			Defs: []statemachine.TransitionDef{
 				{From: "idle", Event: "run", To: "running"},

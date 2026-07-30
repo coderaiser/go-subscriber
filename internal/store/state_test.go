@@ -3,12 +3,12 @@ package store_test
 import (
 	"testing"
 
-	tape "github.com/coderaiser/go-tape"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/store"
 )
 
 func TestStateGetMissingReturnsNil(t *testing.T) {
-	tape.Test(t, "store/state: Get returns nil for unknown key", func(t *tape.T) {
+	Test.Test(t, "store/state: Get returns nil for unknown key", func(t *Test.T) {
 		s := store.NewStateStore()
 		ptr, _ := s.Get("msisdn:svc")
 		t.Ok(ptr == nil)
@@ -17,7 +17,7 @@ func TestStateGetMissingReturnsNil(t *testing.T) {
 }
 
 func TestStateGetMissingNoError(t *testing.T) {
-	tape.Test(t, "store/state: Get does not error for unknown key", func(t *tape.T) {
+	Test.Test(t, "store/state: Get does not error for unknown key", func(t *Test.T) {
 		s := store.NewStateStore()
 		_, err := s.Get("msisdn:svc")
 		t.NoError(err)
@@ -26,7 +26,7 @@ func TestStateGetMissingNoError(t *testing.T) {
 }
 
 func TestStateSetAndGetNoError(t *testing.T) {
-	tape.Test(t, "store/state: Set does not error", func(t *tape.T) {
+	Test.Test(t, "store/state: Set does not error", func(t *Test.T) {
 		s := store.NewStateStore()
 		err := s.Set("msisdn:svc", "active")
 		t.NoError(err)
@@ -35,7 +35,7 @@ func TestStateSetAndGetNoError(t *testing.T) {
 }
 
 func TestStateGetReturnsSetValue(t *testing.T) {
-	tape.Test(t, "store/state: Get returns what was Set", func(t *tape.T) {
+	Test.Test(t, "store/state: Get returns what was Set", func(t *Test.T) {
 		s := store.NewStateStore()
 		s.Set("msisdn:svc", "active")
 		ptr, _ := s.Get("msisdn:svc")
@@ -45,7 +45,7 @@ func TestStateGetReturnsSetValue(t *testing.T) {
 }
 
 func TestStateOverwriteNoError(t *testing.T) {
-	tape.Test(t, "store/state: overwrite does not error", func(t *tape.T) {
+	Test.Test(t, "store/state: overwrite does not error", func(t *Test.T) {
 		s := store.NewStateStore()
 		s.Set("k", "trial")
 		err := s.Set("k", "suspended")
@@ -55,7 +55,7 @@ func TestStateOverwriteNoError(t *testing.T) {
 }
 
 func TestStateOverwriteValue(t *testing.T) {
-	tape.Test(t, "store/state: Set overwrites previous value", func(t *tape.T) {
+	Test.Test(t, "store/state: Set overwrites previous value", func(t *Test.T) {
 		s := store.NewStateStore()
 		s.Set("k", "trial")
 		s.Set("k", "suspended")
@@ -66,7 +66,7 @@ func TestStateOverwriteValue(t *testing.T) {
 }
 
 func TestStateIsolation(t *testing.T) {
-	tape.Test(t, "store/state: different keys are independent", func(t *tape.T) {
+	Test.Test(t, "store/state: different keys are independent", func(t *Test.T) {
 		s := store.NewStateStore()
 		s.Set("a", "active")
 		s.Set("b", "terminated")
@@ -78,7 +78,7 @@ func TestStateIsolation(t *testing.T) {
 }
 
 func TestStateAllEmpty(t *testing.T) {
-	tape.Test(t, "store/state: All returns empty map when no states set", func(t *tape.T) {
+	Test.Test(t, "store/state: All returns empty map when no states set", func(t *Test.T) {
 		s := store.NewStateStore()
 		all := s.All()
 		t.Ok(len(all) == 0)
@@ -87,7 +87,7 @@ func TestStateAllEmpty(t *testing.T) {
 }
 
 func TestStateAllReturnsAllKeys(t *testing.T) {
-	tape.Test(t, "store/state: All returns all set keys", func(t *tape.T) {
+	Test.Test(t, "store/state: All returns all set keys", func(t *Test.T) {
 		s := store.NewStateStore()
 		s.Set("a:svc1", "active")
 		s.Set("b:svc1", "trial")
@@ -98,7 +98,7 @@ func TestStateAllReturnsAllKeys(t *testing.T) {
 }
 
 func TestStateAllIsSnapshot(t *testing.T) {
-	tape.Test(t, "store/state: All returns a copy not a reference", func(t *tape.T) {
+	Test.Test(t, "store/state: All returns a copy not a reference", func(t *Test.T) {
 		s := store.NewStateStore()
 		s.Set("a:svc1", "active")
 		all := s.All()

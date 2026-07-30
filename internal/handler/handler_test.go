@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	tape "github.com/coderaiser/go-tape"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/engine"
 	"github.com/coderaiser/go-subscriber/internal/handler"
 	"github.com/coderaiser/go-subscriber/internal/store"
@@ -44,7 +44,7 @@ func get(h http.Handler, path string) *httptest.ResponseRecorder {
 }
 
 func TestSubscribeOK(t *testing.T) {
-	tape.Test(t, "handler: POST /subscribe returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: POST /subscribe returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		t.Ok(w.Code == http.StatusOK)
@@ -53,7 +53,7 @@ func TestSubscribeOK(t *testing.T) {
 }
 
 func TestSubscribeDuplicate(t *testing.T) {
-	tape.Test(t, "handler: POST /subscribe duplicate returns 409", func(t *tape.T) {
+	Test.Test(t, "handler: POST /subscribe duplicate returns 409", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		w := post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
@@ -63,7 +63,7 @@ func TestSubscribeDuplicate(t *testing.T) {
 }
 
 func TestSubscribeBadBody(t *testing.T) {
-	tape.Test(t, "handler: POST /subscribe bad JSON returns 400", func(t *tape.T) {
+	Test.Test(t, "handler: POST /subscribe bad JSON returns 400", func(t *Test.T) {
 		h := newHandler(t.TB())
 		req := httptest.NewRequest(http.MethodPost, "/subscribe", bytes.NewReader([]byte("bad")))
 		w := httptest.NewRecorder()
@@ -74,7 +74,7 @@ func TestSubscribeBadBody(t *testing.T) {
 }
 
 func TestUnsubscribeOK(t *testing.T) {
-	tape.Test(t, "handler: POST /unsubscribe returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: POST /unsubscribe returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		w := post(h, "/unsubscribe", map[string]any{"msisdn": "111", "service_id": "svc1"})
@@ -84,7 +84,7 @@ func TestUnsubscribeOK(t *testing.T) {
 }
 
 func TestChargeResultOK(t *testing.T) {
-	tape.Test(t, "handler: POST /charge-result returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: POST /charge-result returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		w := post(h, "/charge-result", map[string]any{
@@ -96,7 +96,7 @@ func TestChargeResultOK(t *testing.T) {
 }
 
 func TestStateOK(t *testing.T) {
-	tape.Test(t, "handler: GET /state/{msisdn} returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: GET /state/{msisdn} returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		w := get(h, "/state/111")
@@ -108,7 +108,7 @@ func TestStateOK(t *testing.T) {
 // ── /subscribe ─────────────────────────────────────────────────────────────
 
 func TestSubscribeMethodNotAllowed(t *testing.T) {
-	tape.Test(t, "handler: GET /subscribe returns 405", func(t *tape.T) {
+	Test.Test(t, "handler: GET /subscribe returns 405", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := get(h, "/subscribe")
 		t.Ok(w.Code == http.StatusMethodNotAllowed)
@@ -117,7 +117,7 @@ func TestSubscribeMethodNotAllowed(t *testing.T) {
 }
 
 func TestSubscribeCooloff(t *testing.T) {
-	tape.Test(t, "handler: POST /subscribe during cooloff returns 409", func(t *tape.T) {
+	Test.Test(t, "handler: POST /subscribe during cooloff returns 409", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		post(h, "/unsubscribe", map[string]any{"msisdn": "111", "service_id": "svc1"})
@@ -128,7 +128,7 @@ func TestSubscribeCooloff(t *testing.T) {
 }
 
 func TestRenewOK(t *testing.T) {
-	tape.Test(t, "handler: POST /renew returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: POST /renew returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		w := post(h, "/renew", map[string]any{"msisdn": "111", "service_id": "svc1", "success": true})
@@ -138,7 +138,7 @@ func TestRenewOK(t *testing.T) {
 }
 
 func TestExpireTrialOK(t *testing.T) {
-	tape.Test(t, "handler: POST /expire-trial returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: POST /expire-trial returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": true})
 		w := post(h, "/expire-trial", map[string]any{"msisdn": "111", "service_id": "svc1", "success": true})
@@ -148,7 +148,7 @@ func TestExpireTrialOK(t *testing.T) {
 }
 
 func TestRetryOK(t *testing.T) {
-	tape.Test(t, "handler: POST /retry returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: POST /retry returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		post(h, "/charge-result", map[string]any{
@@ -161,7 +161,7 @@ func TestRetryOK(t *testing.T) {
 }
 
 func TestKickOutOK(t *testing.T) {
-	tape.Test(t, "handler: POST /kick-out returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: POST /kick-out returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		post(h, "/charge-result", map[string]any{
@@ -174,7 +174,7 @@ func TestKickOutOK(t *testing.T) {
 }
 
 func TestStubSendMT(t *testing.T) {
-	tape.Test(t, "handler: POST /send-mt stub returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: POST /send-mt stub returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := post(h, "/send-mt", map[string]any{"msisdn": "111"})
 		t.Ok(w.Code == http.StatusOK)
@@ -185,7 +185,7 @@ func TestStubSendMT(t *testing.T) {
 // ── /unsubscribe ───────────────────────────────────────────────────────────
 
 func TestUnsubscribeMethodNotAllowed(t *testing.T) {
-	tape.Test(t, "handler: GET /unsubscribe returns 405", func(t *tape.T) {
+	Test.Test(t, "handler: GET /unsubscribe returns 405", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := get(h, "/unsubscribe")
 		t.Ok(w.Code == http.StatusMethodNotAllowed)
@@ -194,7 +194,7 @@ func TestUnsubscribeMethodNotAllowed(t *testing.T) {
 }
 
 func TestUnsubscribeBadBody(t *testing.T) {
-	tape.Test(t, "handler: POST /unsubscribe bad JSON returns 400", func(t *tape.T) {
+	Test.Test(t, "handler: POST /unsubscribe bad JSON returns 400", func(t *Test.T) {
 		h := newHandler(t.TB())
 		req := httptest.NewRequest(http.MethodPost, "/unsubscribe", bytes.NewReader([]byte("bad")))
 		w := httptest.NewRecorder()
@@ -207,7 +207,7 @@ func TestUnsubscribeBadBody(t *testing.T) {
 // ── /charge-result ─────────────────────────────────────────────────────────
 
 func TestChargeResultMethodNotAllowed(t *testing.T) {
-	tape.Test(t, "handler: GET /charge-result returns 405", func(t *tape.T) {
+	Test.Test(t, "handler: GET /charge-result returns 405", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := get(h, "/charge-result")
 		t.Ok(w.Code == http.StatusMethodNotAllowed)
@@ -216,7 +216,7 @@ func TestChargeResultMethodNotAllowed(t *testing.T) {
 }
 
 func TestChargeResultBadBody(t *testing.T) {
-	tape.Test(t, "handler: POST /charge-result bad JSON returns 400", func(t *tape.T) {
+	Test.Test(t, "handler: POST /charge-result bad JSON returns 400", func(t *Test.T) {
 		h := newHandler(t.TB())
 		req := httptest.NewRequest(http.MethodPost, "/charge-result", bytes.NewReader([]byte("bad")))
 		w := httptest.NewRecorder()
@@ -227,7 +227,7 @@ func TestChargeResultBadBody(t *testing.T) {
 }
 
 func TestChargeResultUnknownSub(t *testing.T) {
-	tape.Test(t, "handler: POST /charge-result unknown sub returns 404", func(t *tape.T) {
+	Test.Test(t, "handler: POST /charge-result unknown sub returns 404", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := post(h, "/charge-result", map[string]any{
 			"msisdn": "nobody", "service_id": "svc1", "result": engine.ResultSuccess,
@@ -240,7 +240,7 @@ func TestChargeResultUnknownSub(t *testing.T) {
 // ── /renew ─────────────────────────────────────────────────────────────────
 
 func TestRenewMethodNotAllowed(t *testing.T) {
-	tape.Test(t, "handler: GET /renew returns 405", func(t *tape.T) {
+	Test.Test(t, "handler: GET /renew returns 405", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := get(h, "/renew")
 		t.Ok(w.Code == http.StatusMethodNotAllowed)
@@ -249,7 +249,7 @@ func TestRenewMethodNotAllowed(t *testing.T) {
 }
 
 func TestRenewBadBody(t *testing.T) {
-	tape.Test(t, "handler: POST /renew bad JSON returns 400", func(t *tape.T) {
+	Test.Test(t, "handler: POST /renew bad JSON returns 400", func(t *Test.T) {
 		h := newHandler(t.TB())
 		req := httptest.NewRequest(http.MethodPost, "/renew", bytes.NewReader([]byte("bad")))
 		w := httptest.NewRecorder()
@@ -260,7 +260,7 @@ func TestRenewBadBody(t *testing.T) {
 }
 
 func TestRenewUnknownSub(t *testing.T) {
-	tape.Test(t, "handler: POST /renew unknown sub returns 404", func(t *tape.T) {
+	Test.Test(t, "handler: POST /renew unknown sub returns 404", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := post(h, "/renew", map[string]any{"msisdn": "nobody", "service_id": "svc1", "success": true})
 		t.Ok(w.Code == http.StatusNotFound)
@@ -271,7 +271,7 @@ func TestRenewUnknownSub(t *testing.T) {
 // ── /expire-trial ──────────────────────────────────────────────────────────
 
 func TestExpireTrialMethodNotAllowed(t *testing.T) {
-	tape.Test(t, "handler: GET /expire-trial returns 405", func(t *tape.T) {
+	Test.Test(t, "handler: GET /expire-trial returns 405", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := get(h, "/expire-trial")
 		t.Ok(w.Code == http.StatusMethodNotAllowed)
@@ -280,7 +280,7 @@ func TestExpireTrialMethodNotAllowed(t *testing.T) {
 }
 
 func TestExpireTrialBadBody(t *testing.T) {
-	tape.Test(t, "handler: POST /expire-trial bad JSON returns 400", func(t *tape.T) {
+	Test.Test(t, "handler: POST /expire-trial bad JSON returns 400", func(t *Test.T) {
 		h := newHandler(t.TB())
 		req := httptest.NewRequest(http.MethodPost, "/expire-trial", bytes.NewReader([]byte("bad")))
 		w := httptest.NewRecorder()
@@ -291,7 +291,7 @@ func TestExpireTrialBadBody(t *testing.T) {
 }
 
 func TestExpireTrialUnknownSub(t *testing.T) {
-	tape.Test(t, "handler: POST /expire-trial unknown sub returns 404", func(t *tape.T) {
+	Test.Test(t, "handler: POST /expire-trial unknown sub returns 404", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := post(h, "/expire-trial", map[string]any{"msisdn": "nobody", "service_id": "svc1", "success": true})
 		t.Ok(w.Code == http.StatusNotFound)
@@ -302,7 +302,7 @@ func TestExpireTrialUnknownSub(t *testing.T) {
 // ── /retry ─────────────────────────────────────────────────────────────────
 
 func TestRetryMethodNotAllowed(t *testing.T) {
-	tape.Test(t, "handler: GET /retry returns 405", func(t *tape.T) {
+	Test.Test(t, "handler: GET /retry returns 405", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := get(h, "/retry")
 		t.Ok(w.Code == http.StatusMethodNotAllowed)
@@ -311,7 +311,7 @@ func TestRetryMethodNotAllowed(t *testing.T) {
 }
 
 func TestRetryBadBody(t *testing.T) {
-	tape.Test(t, "handler: POST /retry bad JSON returns 400", func(t *tape.T) {
+	Test.Test(t, "handler: POST /retry bad JSON returns 400", func(t *Test.T) {
 		h := newHandler(t.TB())
 		req := httptest.NewRequest(http.MethodPost, "/retry", bytes.NewReader([]byte("bad")))
 		w := httptest.NewRecorder()
@@ -322,7 +322,7 @@ func TestRetryBadBody(t *testing.T) {
 }
 
 func TestRetryUnknownSub(t *testing.T) {
-	tape.Test(t, "handler: POST /retry unknown sub returns 404", func(t *tape.T) {
+	Test.Test(t, "handler: POST /retry unknown sub returns 404", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := post(h, "/retry", map[string]any{"msisdn": "nobody", "service_id": "svc1", "success": true})
 		t.Ok(w.Code == http.StatusNotFound)
@@ -333,7 +333,7 @@ func TestRetryUnknownSub(t *testing.T) {
 // ── /kick-out ──────────────────────────────────────────────────────────────
 
 func TestKickOutMethodNotAllowed(t *testing.T) {
-	tape.Test(t, "handler: GET /kick-out returns 405", func(t *tape.T) {
+	Test.Test(t, "handler: GET /kick-out returns 405", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := get(h, "/kick-out")
 		t.Ok(w.Code == http.StatusMethodNotAllowed)
@@ -342,7 +342,7 @@ func TestKickOutMethodNotAllowed(t *testing.T) {
 }
 
 func TestKickOutBadBody(t *testing.T) {
-	tape.Test(t, "handler: POST /kick-out bad JSON returns 400", func(t *tape.T) {
+	Test.Test(t, "handler: POST /kick-out bad JSON returns 400", func(t *Test.T) {
 		h := newHandler(t.TB())
 		req := httptest.NewRequest(http.MethodPost, "/kick-out", bytes.NewReader([]byte("bad")))
 		w := httptest.NewRecorder()
@@ -353,7 +353,7 @@ func TestKickOutBadBody(t *testing.T) {
 }
 
 func TestKickOutUnknownSub(t *testing.T) {
-	tape.Test(t, "handler: POST /kick-out unknown sub returns 404", func(t *tape.T) {
+	Test.Test(t, "handler: POST /kick-out unknown sub returns 404", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := post(h, "/kick-out", map[string]any{"msisdn": "nobody", "service_id": "svc1"})
 		t.Ok(w.Code == http.StatusNotFound)
@@ -364,7 +364,7 @@ func TestKickOutUnknownSub(t *testing.T) {
 // ── /state/ ────────────────────────────────────────────────────────────────
 
 func TestStateMethodNotAllowed(t *testing.T) {
-	tape.Test(t, "handler: POST /state/ returns 405", func(t *tape.T) {
+	Test.Test(t, "handler: POST /state/ returns 405", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := post(h, "/state/", map[string]any{})
 		t.Ok(w.Code == http.StatusMethodNotAllowed)
@@ -373,7 +373,7 @@ func TestStateMethodNotAllowed(t *testing.T) {
 }
 
 func TestStateMissingMsisdn(t *testing.T) {
-	tape.Test(t, "handler: GET /state/ with empty msisdn returns 400", func(t *tape.T) {
+	Test.Test(t, "handler: GET /state/ with empty msisdn returns 400", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := get(h, "/state/")
 		t.Ok(w.Code == http.StatusBadRequest)
@@ -382,7 +382,7 @@ func TestStateMissingMsisdn(t *testing.T) {
 }
 
 func TestStateNoSubscriptions(t *testing.T) {
-	tape.Test(t, "handler: GET /state/{msisdn} with no subscriptions returns empty array", func(t *tape.T) {
+	Test.Test(t, "handler: GET /state/{msisdn} with no subscriptions returns empty array", func(t *Test.T) {
 		h := newHandler(t.TB())
 		w := get(h, "/state/nobody")
 		t.Ok(w.Code == http.StatusOK)
@@ -391,7 +391,7 @@ func TestStateNoSubscriptions(t *testing.T) {
 }
 
 func TestRenewFail(t *testing.T) {
-	tape.Test(t, "handler: POST /renew with success=false returns 200", func(t *tape.T) {
+	Test.Test(t, "handler: POST /renew with success=false returns 200", func(t *Test.T) {
 		h := newHandler(t.TB())
 		post(h, "/subscribe", map[string]any{"msisdn": "111", "service_id": "svc1", "trial": false})
 		w := post(h, "/renew", map[string]any{"msisdn": "111", "service_id": "svc1", "success": false})

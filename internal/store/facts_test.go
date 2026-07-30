@@ -3,12 +3,12 @@ package store_test
 import (
 	"testing"
 
-	tape "github.com/coderaiser/go-tape"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/store"
 )
 
 func TestFactsGetMissing(t *testing.T) {
-	tape.Test(t, "store/facts: Get returns zero facts for unknown key", func(t *tape.T) {
+	Test.Test(t, "store/facts: Get returns zero facts for unknown key", func(t *Test.T) {
 		f := store.NewFactsStore()
 		facts := f.Get("msisdn:svc")
 		t.Ok(facts.CooloffUntil == 0)
@@ -17,7 +17,7 @@ func TestFactsGetMissing(t *testing.T) {
 }
 
 func TestFactsSetAndGetCooloff(t *testing.T) {
-	tape.Test(t, "store/facts: Set then Get returns CooloffUntil", func(t *tape.T) {
+	Test.Test(t, "store/facts: Set then Get returns CooloffUntil", func(t *Test.T) {
 		f := store.NewFactsStore()
 		f.Set("k", store.Facts{CooloffUntil: 999, FallbackAttempt: 2})
 		facts := f.Get("k")
@@ -27,7 +27,7 @@ func TestFactsSetAndGetCooloff(t *testing.T) {
 }
 
 func TestFactsSetAndGetFallback(t *testing.T) {
-	tape.Test(t, "store/facts: Set then Get returns FallbackAttempt", func(t *tape.T) {
+	Test.Test(t, "store/facts: Set then Get returns FallbackAttempt", func(t *Test.T) {
 		f := store.NewFactsStore()
 		f.Set("k", store.Facts{CooloffUntil: 999, FallbackAttempt: 2})
 		facts := f.Get("k")
@@ -37,7 +37,7 @@ func TestFactsSetAndGetFallback(t *testing.T) {
 }
 
 func TestFactsOverwrite(t *testing.T) {
-	tape.Test(t, "store/facts: Set overwrites previous facts", func(t *tape.T) {
+	Test.Test(t, "store/facts: Set overwrites previous facts", func(t *Test.T) {
 		f := store.NewFactsStore()
 		f.Set("k", store.Facts{CooloffUntil: 1})
 		f.Set("k", store.Facts{CooloffUntil: 2})
