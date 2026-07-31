@@ -2,7 +2,7 @@
   "name": "go-subscriber",
   "private": true,
   "type": "commonjs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Tape for Go",
   "main": "index.js",
   "scripts": {
