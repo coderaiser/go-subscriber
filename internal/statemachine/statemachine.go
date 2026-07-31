@@ -205,7 +205,6 @@ func (m *Memory[S]) Set(id string, state S) error {
 type noopHandler struct{}
 
 func (noopHandler) Enabled(context.Context, slog.Level) bool  { return false }
-func (noopHandler) Handle(context.Context, slog.Record) error  { return nil }
-func (noopHandler) WithAttrs(_ []slog.Attr) slog.Handler { return noopHandler{} }
-func (noopHandler) WithGroup(_ string) slog.Handler      { return noopHandler{} }
-
+func (noopHandler) Handle(context.Context, slog.Record) error { return nil }
+func (noopHandler) WithAttrs(_ []slog.Attr) slog.Handler      { return noopHandler{} }
+func (noopHandler) WithGroup(_ string) slog.Handler           { return noopHandler{} }

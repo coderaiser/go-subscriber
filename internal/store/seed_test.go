@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/store"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 )
 
 func TestSeedLoadsSubscribers(t *testing.T) {

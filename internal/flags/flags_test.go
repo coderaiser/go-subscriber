@@ -3,8 +3,8 @@ package flags_test
 import (
 	"testing"
 
-	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/flags"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 )
 
 func TestNoFlags(t *testing.T) {

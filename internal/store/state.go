@@ -2,7 +2,6 @@ package store
 
 import (
 	"sync"
-
 )
 
 // StateStore is the statemachine adapter.

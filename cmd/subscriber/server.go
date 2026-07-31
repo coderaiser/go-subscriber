@@ -105,8 +105,8 @@ func startTestServer(ctx context.Context) (string, context.CancelFunc) {
 	log := slog.New(slog.NewTextHandler(ioDiscard{}, nil))
 	st := store.NewStateStore()
 	if err := store.Seed("users.json", st); err != nil {
-        panic("subscriber: failed to load users.json: " + err.Error())
-    }
+		panic("subscriber: failed to load users.json: " + err.Error())
+	}
 	fs := store.NewFactsStore()
 	eng := engine.New(st, fs, time.Now, log)
 
@@ -120,7 +120,11 @@ func startTestServer(ctx context.Context) (string, context.CancelFunc) {
 	lis, _ := net.Listen("tcp", "127.0.0.1:0")
 
 	ctx, cancel := context.WithCancel(ctx)
-	go srv.Serve(lis)
+	go func() {
+    	if err := srv.Serve(lis); err != nil && err != http.ErrServerClosed {
+    		panic(err)
+    	}
+    }()
 	go func() {
 		<-ctx.Done()
 		srv.Close()

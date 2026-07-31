@@ -3,8 +3,8 @@ package debug_test
 import (
 	"testing"
 
-	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/debug"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 )
 
 func TestLoggerDisabledByDefault(t *testing.T) {

@@ -229,7 +229,6 @@ func New(eng *engine.Engine, states *store.StateStore) http.Handler {
 		writeJSON(w, http.StatusOK, map[string]any{"status": "ok", "stub": true})
 	})
 
-
 	mux.HandleFunc("/status", statusStubHandler)
 	mux.HandleFunc("/services-history", servicesHistoryHandler)
 	mux.HandleFunc("/request-pin", stubHandler("sent", true))
@@ -239,7 +238,6 @@ func New(eng *engine.Engine, states *store.StateStore) http.Handler {
 	mux.HandleFunc("/sync", stubHandler("synced", true))
 	mux.HandleFunc("/on-delivery-report", stubHandler("received", true))
 
-	
 	return mux
 }
 
@@ -263,5 +261,3 @@ func statusStubHandler(w http.ResponseWriter, r *http.Request) {
 func servicesHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"services": []any{}, "stub": true})
 }
-
-

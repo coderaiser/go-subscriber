@@ -96,8 +96,6 @@ func (t *T) NotMatch(s, substr string) {
 	}
 }
 
-
-
 // Comment is a no-op that prints a message.
 func (t *T) Comment(msg string) {
 	t.parent.Log(msg)

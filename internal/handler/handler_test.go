@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/engine"
 	"github.com/coderaiser/go-subscriber/internal/handler"
 	"github.com/coderaiser/go-subscriber/internal/store"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 )
 
 func newHandler(t *testing.T) http.Handler {

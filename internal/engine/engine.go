@@ -257,4 +257,3 @@ func (e *Engine) Facts() *store.FactsStore { return e.facts }
 
 // States returns the StateStore for direct access in tests.
 func (e *Engine) States() *store.StateStore { return e.states }
-

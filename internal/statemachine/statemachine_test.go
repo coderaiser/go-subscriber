@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"testing"
 
-	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/statemachine"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 )
 
 type state int

@@ -3,8 +3,8 @@ package meta_test
 import (
 	"testing"
 
-	Test "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/flags/meta"
+	Test "github.com/coderaiser/go-subscriber/internal/tape"
 )
 
 func TestVersionLineDefault(t *testing.T) {

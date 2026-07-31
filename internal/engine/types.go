@@ -15,15 +15,15 @@ const (
 type Event = string
 
 const (
-	EventSubscribeTrial  = "subscribe_trial"
-	EventSubscribePaid   = "subscribe_paid"
-	EventExpireSuccess   = "expire_success"
-	EventExpireFail      = "expire_fail"
-	EventRenewSuccess    = "renew_success"
-	EventRenewFail       = "renew_fail"
-	EventRetrySuccess    = "retry_success"
-	EventKickOut         = "kick_out"
-	EventUnsubscribe     = "unsubscribe"
+	EventSubscribeTrial = "subscribe_trial"
+	EventSubscribePaid  = "subscribe_paid"
+	EventExpireSuccess  = "expire_success"
+	EventExpireFail     = "expire_fail"
+	EventRenewSuccess   = "renew_success"
+	EventRenewFail      = "renew_fail"
+	EventRetrySuccess   = "retry_success"
+	EventKickOut        = "kick_out"
+	EventUnsubscribe    = "unsubscribe"
 )
 
 // ChargeResult is the answer the carrier sends back for a charge attempt.

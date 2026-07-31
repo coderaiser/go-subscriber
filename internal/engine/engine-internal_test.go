@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/coderaiser/go-subscriber/internal/tape"
 	"github.com/coderaiser/go-subscriber/internal/statemachine"
 	"github.com/coderaiser/go-subscriber/internal/store"
+	. "github.com/coderaiser/go-subscriber/internal/tape"
 )
 
 var epoch = time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
