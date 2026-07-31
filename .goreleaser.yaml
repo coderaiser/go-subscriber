@@ -4,5 +4,5 @@ builds:
     binary: subscriber
 archives:
   - format_overrides:
-      formats:
+      - formats:
         - binary
