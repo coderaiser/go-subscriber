@@ -1,15 +1,16 @@
 {
   "name": "go-subscriber",
   "private": true,
+  "type": "commonjs",
   "version": "1.0.1",
   "description": "Tape for Go",
   "main": "index.js",
   "scripts": {
-    "test": "task test",
-    "coverage": "task coverage",
-    "build": "task build",
-    "lint": "task lint",
-    "fix:lint": "task fix:lint"
+    "test": "madrun test",
+    "coverage": "madrun coverage",
+    "build": "madrun build",
+    "lint": "madrun lint",
+    "fix:lint": "madrun fix:lint"
   },
   "repository": {
     "type": "git",
@@ -18,9 +19,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/coderaiser/go-subscriber/issues"
   },
-  "homepage": "https://github.com/coderaiser/go-subscriber#readme"
+  "homepage": "https://github.com/coderaiser/go-subscriber#readme",
+  "devDependencies": {
+    "@putout/plugin-goreleaser": "^1.0.0",
+    "eslint-plugin-putout": "^31.4.1",
+    "madrun": "^13.0.4",
+    "putout": "^42.10.4"
+  }
 }

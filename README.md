@@ -1,7 +1,6 @@
 # Subscriber
 
-Subscription engine simulator. HTTP service that tracks every `(msisdn, service)`
-pair through its billing lifecycle: trial → active → suspended → terminated/removed.
+Subscription engine simulator. HTTP service that tracks every `(msisdn, service)`pair through its billing lifecycle: trial → active → suspended → terminated/removed.
 
 Built as a work sample for a Telco SDP assignment.
 
@@ -43,19 +42,14 @@ knows nothing about business logic. Changing the HTTP framework touches only
 the handler layer. Swapping persistence touches only the store layer.
 
 **Two stores, not one** — `StateStore` is the state machine's adapter: it owns
-the current state string per key and satisfies `Adapter[string]`. `FactsStore`
-is the engine's private store: it owns `CooloffUntil` and `FallbackAttempt`,
+the current state string per key and satisfies `Adapter[string]`. `FactsStore`is the engine's private store: it owns `CooloffUntil` and `FallbackAttempt`,
 which persist across subscriptions and have no place in the machine. Keeping
 them separate means the machine stays generic and the engine owns its invariants.
 
-**StateMachine vendored from go-tape** — `internal/statemachine/statemachine.go`
-is a single-file vendor of the statemachine package from
-[coderaiser/go-tape](https://github.com/coderaiser/go-tape). TOML support
-removed (external dep). Memory adapter merged into the same file. No `go.mod`
-dependency — the code is ours to read and explain in a review.
+**StateMachine vendored from go-tape** — `internal/statemachine/statemachine.go`is a single-file vendor of the statemachine package from[coderaiser/go-tape](https://github.com/coderaiser/go-tape). TOML support
+removed (external dep). Memory adapter merged into the same file. No `go.mod`dependency — the code is ours to read and explain in a review.
 
-**Ladder counter in the engine, not the machine** — the spec's `LOW_BALANCE`
-fallback (3 attempts before suspending) does not map to FSM states. Modelling
+**Ladder counter in the engine, not the machine** — the spec's `LOW_BALANCE`fallback (3 attempts before suspending) does not map to FSM states. Modelling
 it as `fallback_1`/`fallback_2` states would invent states the spec does not
 have. Instead the counter lives in `FactsStore` and the engine checks it before
 deciding which event to fire. The machine table stays a faithful 9-row map of
@@ -66,50 +60,42 @@ the spec. See `DECISIONS.md` for the full reasoning.
 ```
 (no state) ── subscribe trial ──────────► trial
 (no state) ── subscribe paid ───────────► active
-
 trial      ── expire_success ───────────► active
 trial      ── expire_fail ──────────────► suspended
 trial      ── unsubscribe ──────────────► terminated
-
 active     ── renew_success (self-loop) ► active
 active     ── renew_fail ───────────────► suspended
 active     ── unsubscribe ──────────────► terminated
-
 suspended  ── retry_success ────────────► active
 suspended  ── kick_out ─────────────────► removed
 suspended  ── unsubscribe ──────────────► terminated
-
 terminated/removed ── (cooloff 30d) ───► can re-subscribe
 ```
 
 ## Endpoints
 
-| Method | Path | Notes |
-|--------|------|-------|
-| `POST` | `/subscribe` | trial or paid; checks cooloff and duplicate |
-| `POST` | `/unsubscribe` | any state → terminated; starts 30-day cooloff |
-| `POST` | `/charge-result` | injects carrier answer; drives ladder + transitions |
-| `POST` | `/renew` | scheduler simulation: renewal tick |
-| `POST` | `/expire-trial` | scheduler simulation: trial expiry |
-| `POST` | `/retry` | scheduler simulation: retry window |
-| `POST` | `/kick-out` | scheduler simulation: retries exhausted |
-| `GET`  | `/state/{msisdn}` | all subscriptions for a msisdn |
-| `POST` | `/send-mt` | stub — returns `{"status":"ok","stub":true}` |
-| `GET`  | `/healthz` | liveness probe |
-| `GET`  | `/readyz` | readiness probe |
+| Method | Path              | Notes                                               |
+|--------|-------------------|-----------------------------------------------------|
+| `POST` | `/subscribe`      | trial or paid; checks cooloff and duplicate         |
+| `POST` | `/unsubscribe`    | any state → terminated; starts 30-day cooloff       |
+| `POST` | `/charge-result`  | injects carrier answer; drives ladder + transitions |
+| `POST` | `/renew`          | scheduler simulation: renewal tick                  |
+| `POST` | `/expire-trial`   | scheduler simulation: trial expiry                  |
+| `POST` | `/retry`          | scheduler simulation: retry window                  |
+| `POST` | `/kick-out`       | scheduler simulation: retries exhausted             |
+| `GET`  | `/state/{msisdn}` | all subscriptions for a msisdn                      |
+| `POST` | `/send-mt`        | stub — returns `{"status":"ok","stub":true}`        |
+| `GET`  | `/healthz`        | liveness probe                                      |
+| `GET`  | `/readyz`         | readiness probe                                     |
 
 ## Running locally
 
 ```sh
 go run ./cmd/subscriber
 curl http://localhost:8080/healthz
-
 # with debug logging
-
 DEBUG=subscriber:* go run ./cmd/subscriber
-
 # json logs (production style)
-
 LOG_FORMAT=json PORT=8080 go run ./cmd/subscriber
 ```
 
@@ -123,13 +109,9 @@ LOG_FORMAT=json PORT=8080 go run ./cmd/subscriber
 ## Testing
 
 ```sh
-
 # run all tests
-
 go test ./...
-
 # with coverage
-
 go test -coverprofile=coverage.out -covermode=atomic ./...
 go tool cover -func=coverage.out
 ```
@@ -156,29 +138,17 @@ Or open `demo.http` in VS Code (REST Client extension) or JetBrains HTTP Client.
 ## Kubernetes (k3d)
 
 ```sh
-
 # create local cluster
-
 k3d cluster create subscriber -p "8080:80@loadbalancer"
-
 # deploy
-
 kubectl apply -k deploy/k8s/overlays/ci
-
 # wait
-
 kubectl -n subscriber rollout status deployment/subscriber
-
 # test
-
 curl http://localhost:8080/healthz
-
 # logs
-
 kubectl -n subscriber logs -l app=subscriber -f
-
 # tear down
-
 k3d cluster delete subscriber
 ```
 

@@ -17,12 +17,11 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - name: Install
         run: |
-          bun install putout redrun palabra -g
+          bun install redrun palabra -g
           palabra i task tape coverage golangci-lint
       - name: Lint
         run: |
-          putout . --fix
-          golangci-lint run --fix
+          redrun fix:lint
       - name: Typos
         uses: coderaiser/typos.ai@v1.1.8
         with:
