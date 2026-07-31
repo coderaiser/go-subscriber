@@ -126,9 +126,12 @@ func startTestServer(ctx context.Context) (string, context.CancelFunc) {
     	}
     }()
 	go func() {
-		<-ctx.Done()
-		srv.Close()
-	}()
+    	<-ctx.Done()
+    
+    	if err := srv.Close(); err != nil {
+    		log.Error("failed to close server", "error", err)
+    	}
+    }()
 
 	return "http://" + lis.Addr().String(), cancel
 }
