@@ -144,23 +144,6 @@ bash demo.sh
 
 Or open `demo.http` in VS Code (REST Client extension) or JetBrains HTTP Client.
 
-## Kubernetes (k3d)
-
-```sh
-# create local cluster
-k3d cluster create subscriber -p "8080:80@loadbalancer"
-# deploy
-kubectl apply -k deploy/k8s/overlays/ci
-# wait
-kubectl -n subscriber rollout status deployment/subscriber
-# test
-curl http://localhost:8080/healthz
-# logs
-kubectl -n subscriber logs -l app=subscriber -f
-# tear down
-k3d cluster delete subscriber
-```
-
 ## Release
 
 Push a tag to trigger build → test → coverage check → goreleaser publishes
