@@ -2,7 +2,7 @@
 
 What I would do next, in priority order.
 
----
+***
 
 ## 1. Complete the subscribe rules gauntlet
 

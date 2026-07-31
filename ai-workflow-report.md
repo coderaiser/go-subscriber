@@ -4,7 +4,7 @@
 
 **Claude Code** with **Claude Sonnet 4.6** — used throughout: spec analysis, architecture planning, implementation, test generation, and tooling.
 
----
+***
 
 ## How the work was planned
 
@@ -12,7 +12,7 @@ The session started by feeding both PDFs to Claude Code and asking it to discuss
 
 Implementation then proceeded in planning loops: generate a plan for the next chunk, implement it, review what was done and what remained, repeat.
 
----
+***
 
 ## Two prompts that actually mattered
 
@@ -26,7 +26,7 @@ Mid-project, after noticing coverage holes with no line-level feedback in the te
 
 This was not planned. It came from following a real friction point to its root.
 
----
+***
 
 ## Where the AI got it wrong
 
@@ -36,7 +36,7 @@ The fix was structural: adopt `go-tape`'s one-assertion-per-subtest style, which
 
 A secondary observation: Claude Code generated `Hook()` and `Validate()` methods on the state machine that the subscriber does not call. In this case the output was evaluated and kept — they belong in a general-purpose library that other projects will pull in, and they are tested within `go-tape`. The point is that the output was reviewed and a conscious decision was made, rather than accepted or discarded automatically.
 
----
+***
 
 ## On AI use generally
 
