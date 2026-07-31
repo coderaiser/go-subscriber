@@ -1,7 +1,7 @@
 {
   "name": "go-subscriber",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tape for Go",
   "main": "index.js",
   "scripts": {
