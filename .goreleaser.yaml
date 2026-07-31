@@ -3,4 +3,6 @@ builds:
   - main: ./cmd/subscriber
     binary: subscriber
 archives:
-  - format: binary
+  - format_overrides:
+      formats:
+        - binary
