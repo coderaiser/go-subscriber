@@ -5,4 +5,4 @@ builds:
 archives:
   - format_overrides:
       - formats:
-        - binary
+          - binary
