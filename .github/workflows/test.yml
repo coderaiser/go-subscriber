@@ -42,4 +42,6 @@ jobs:
         continue-on-error: true
         uses: coverallsapp/github-action@v2
         with:
+          file: coverage.out
+          format: golang
           github-token: ${{ secrets.GITHUB_TOKEN }}
