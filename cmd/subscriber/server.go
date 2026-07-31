@@ -61,14 +61,23 @@ func serve(port string, log *slog.Logger) int {
 	return 0
 }
 
-func handleHealth(w http.ResponseWriter, r *http.Request) {
+func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	w.WriteHeader(status)
+
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		// At this point headers have already been sent, so we can't
+		// change the status code. Just log the error.
+		slog.Error("failed to encode JSON response", "error", err)
+	}
+}
+
+func handleHealth(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
 func handleReady(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
 func newLogger() *slog.Logger {
