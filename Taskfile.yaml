@@ -10,6 +10,11 @@ tasks:
       run.go (CLI glue) is intentionally excluded.
     cmds:
       - coverage || tape
+  report:
+    desc: |
+      Coverage Report
+    cmds:
+      - go test $(go list ./... | grep -Ev '/(node_modules|subscriber|tape)/') -coverprofile=coverage.out
   build:
     desc: Build the binary for the current platform
     cmds:

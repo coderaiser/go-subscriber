@@ -1,8 +1,9 @@
 [exclude]
 files = [
-    "cmd/subscriber/main.go",
-    "cmd/subscriber/server.go",
-    "internal/debug/debug.go",
-    "internal/statemachine/statemachine.go",
-    "internal/tape/tape.go"
+    "**/cmd/subscriber/main.go",
+    "**/cmd/subscriber/server.go",
+    "**/debug/debug.go",
+    "**/statemachine/statemachine.go",
+    "**/tape/tape.go",
+    "**/node_modules"
 ]

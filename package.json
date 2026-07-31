@@ -10,7 +10,8 @@
     "coverage": "madrun coverage",
     "build": "madrun build",
     "lint": "madrun lint",
-    "fix:lint": "madrun fix:lint"
+    "fix:lint": "madrun fix:lint",
+    "report": "madrun report"
   },
   "repository": {
     "type": "git",
