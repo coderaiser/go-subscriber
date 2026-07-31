@@ -1,0 +1,10 @@
+## How things works
+
+> walk one phone number through subscribe → failed renewal → rescued by a retry → unsubscribe, naming the states and what triggers each move.
+
+User 12345678 not using any service, texts sms "START", we check the rulles, and if there is no cooloff and trial not used, because in this way there would be state change. If success, and no payment neaded user has state TRIAL, one week later we try to charge user, if there is not enaugh money we try to take less money after some time. When all tries is over user is SUSPENDED, then user tops-up balance and his status becames ACTIVE. Then user desided to undsubscribe and send "STOP" sms and his status became TERMINATED, he receives sms "you unsubscribed", and cooloff starts and user cannot subscribe again during some period, 30 days for example.
+
+## One design decision I made and why
+
+When I started to work on Subscriber, I check what go can suggest to know what lines not covered: I discovered that built-in tools show only percent, and numbers in html report. I implemented tool [go-coverage](https://github.com/coderaiser/go-coverage). That shows exactly what lines not covered, while I did it, I saw thet built-in Go test runners doesn't control assertion count, and test messages like [supertape](https://github.com/coderaiser/supertape) does. This is important becaouse we need to verify what LLM produce, so there was not need to throw code away. While I investigated how to make wrapper over `go test` so it can control assertions count, and show progress of testing, I saw that [go-tape](https://github.com/coderaiser/go-tape) requires state machine, so I decided to implement state machine that would fits both cases, after it is tested in `go-tape` it can be used in Subscriber. Also it makes design easier, and future proof because state machine knows nothing about domain field and other movable parts, but supports adapters to keep state or read transactions. So it influanced Subscriber architecture drastically: we have state, we have server that handles requirests, so the last part where all things go is engine. It makes design simple , predictable and future proof.
+
