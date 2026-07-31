@@ -31,7 +31,6 @@ tasks:
   fix:lint:
     desc: Run fix lint
     cmds:
-      - putout . --fix
       - golangci-lint run --fix
   clean:
     desc: Remove build artefacts
