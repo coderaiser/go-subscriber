@@ -26,31 +26,42 @@ type Engine struct {
 	machine *statemachine.Machine[string, string]
 }
 
+func parseState(s string) (string, error) {
+	switch s {
+	case StateTrial, StateActive, StateSuspended, StateTerminated, StateRemoved:
+		return s, nil
+	}
+	return "", errors.New("unknown state: " + s)
+}
+
+func parseEvent(e string) (string, error) {
+	switch e {
+	case EventExpireSuccess, EventExpireFail,
+		EventRenewSuccess, EventRenewFail,
+		EventRetrySuccess, EventKickOut,
+		EventUnsubscribe:
+		return e, nil
+	}
+	return "", errors.New("unknown event: " + e)
+}
+
 func New(
 	states *store.StateStore,
 	facts *store.FactsStore,
 	now func() time.Time,
 	log *slog.Logger,
 ) *Engine {
-	parseState := func(s string) (string, error) {
-		switch s {
-		case StateTrial, StateActive, StateSuspended, StateTerminated, StateRemoved:
-			return s, nil
-		}
-		return "", errors.New("unknown state: " + s)
-	}
-	parseEvent := func(e string) (string, error) {
-		switch e {
-		case EventExpireSuccess, EventExpireFail,
-			EventRenewSuccess, EventRenewFail,
-			EventRetrySuccess, EventKickOut,
-			EventUnsubscribe:
-			return e, nil
-		}
-		return "", errors.New("unknown event: " + e)
-	}
+	return newWithSource(transitions, states, facts, now, log)
+}
 
-	m, err := statemachine.New(transitions, parseState, parseEvent, states, false)
+func newWithSource(
+	source statemachine.TransitionSource,
+	states *store.StateStore,
+	facts *store.FactsStore,
+	now func() time.Time,
+	log *slog.Logger,
+) *Engine {
+	m, err := statemachine.New(source, parseState, parseEvent, states, false)
 	if err != nil {
 		panic("subscriber: failed to build state machine: " + err.Error())
 	}
