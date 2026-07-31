@@ -18,6 +18,7 @@ jobs:
       - name: Install
         run: |
           bun install redrun palabra -g
+          bun i --no-save
           palabra i task tape coverage golangci-lint
       - name: Lint
         run: |
