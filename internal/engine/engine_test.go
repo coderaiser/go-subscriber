@@ -1,7 +1,6 @@
 package engine_test
 
 import (
-	"errors"
 	"log/slog"
 	"testing"
 	"time"
@@ -24,9 +23,6 @@ func newEngine(t *testing.T, now func() time.Time) *engine.Engine {
 }
 
 func fixed(t time.Time) func() time.Time { return func() time.Time { return t } }
-
-var errCooloff = errors.New("cooloff")
-var errAlreadySubscribed = errors.New("already subscribed")
 
 func TestSubscribeTrial(t *testing.T) {
 	Test.Test(t, "engine: subscribe trial sets trial state", func(t *Test.T) {
