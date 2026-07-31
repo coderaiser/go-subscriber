@@ -4,13 +4,14 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"fmt"
 
 	"github.com/coderaiser/go-subscriber/internal/store"
-	Test "github.com/coderaiser/go-subscriber/internal/tape"
+	. "github.com/coderaiser/go-subscriber/internal/tape"
 )
 
 func TestSeedLoadsSubscribers(t *testing.T) {
-	Test.Test(t, "store: Seed loads subscribers from JSON file", func(t *Test.T) {
+	Test(t, "store: Seed loads subscribers from JSON file", func(t *T) {
 		dir := t.TB().TempDir()
 		path := filepath.Join(dir, "test.json")
 		os.WriteFile(path, []byte(`[
@@ -31,7 +32,7 @@ func TestSeedLoadsSubscribers(t *testing.T) {
 }
 
 func TestSeedMissingFile(t *testing.T) {
-	Test.Test(t, "store: Seed with missing file returns no error", func(t *Test.T) {
+	Test(t, "store: Seed with missing file returns no error", func(t *T) {
 		ss := store.NewStateStore()
 		err := store.Seed("/nonexistent/path.json", ss)
 		t.NoError(err)
@@ -40,7 +41,7 @@ func TestSeedMissingFile(t *testing.T) {
 }
 
 func TestSeedInvalidJSON(t *testing.T) {
-	Test.Test(t, "store: Seed with invalid JSON returns error", func(t *Test.T) {
+	Test(t, "store: Seed with invalid JSON returns error", func(t *T) {
 		dir := t.TB().TempDir()
 		path := filepath.Join(dir, "bad.json")
 		os.WriteFile(path, []byte(`{invalid}`), 0644)
@@ -52,7 +53,7 @@ func TestSeedInvalidJSON(t *testing.T) {
 }
 
 func TestSeedUnreadableFile(t *testing.T) {
-	Test.Test(t, "store: Seed with unreadable file returns error", func(t *Test.T) {
+	Test(t, "store: Seed with unreadable file returns error", func(t *T) {
 		if os.Getuid() == 0 {
 			t.TB().Skip("running as root; permission checks do not apply")
 		}
@@ -64,4 +65,28 @@ func TestSeedUnreadableFile(t *testing.T) {
 		t.Error(err)
 		t.End()
 	})
+}
+
+func TestSeedSetError(t *testing.T) {
+	Test(t, "store: Seed returns Set error", func(t *T) {
+		dir := t.TB().TempDir()
+		path := filepath.Join(dir, "test.json")
+
+		os.WriteFile(path, []byte(`[
+			{"msisdn": "48100000001", "service_id": "demo-svc", "state": "active"}
+		]`), 0644)
+
+		ss := &errorStateStore{}
+
+		err := store.Seed(path, ss)
+
+		t.Error(err)
+		t.End()
+	})
+}
+
+type errorStateStore struct{}
+
+func (e *errorStateStore) Set(key, value string) error {
+	return fmt.Errorf("forced Set error")
 }

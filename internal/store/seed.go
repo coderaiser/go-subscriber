@@ -12,10 +12,14 @@ type seedEntry struct {
 	State     string `json:"state"`
 }
 
+type stateSetter interface {
+	Set(key, value string) error
+}
+
 // Seed loads a JSON file of pre-existing subscribers into StateStore.
 // Format: [{"msisdn": "123", "service_id": "svc1", "state": "active"}, ...]
 // Missing or empty file is not an error — service starts with empty state.
-func Seed(path string, ss *StateStore) error {
+func Seed(path string, ss stateSetter) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -29,10 +33,12 @@ func Seed(path string, ss *StateStore) error {
 		return err
 	}
 
-	for _, e := range entries {
-		key := e.Msisdn + ":" + e.ServiceID
-		ss.Set(key, e.State)
-	}
+    for _, e := range entries {
+        key := e.Msisdn + ":" + e.ServiceID
 
+        if err := ss.Set(key, e.State); err != nil {
+            return err
+        }
+    }
 	return nil
 }
