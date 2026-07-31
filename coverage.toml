@@ -1,2 +1,8 @@
 [exclude]
-files = ["cmd/subscriber/main.go", "cmd/subscriber/server.go", "internal/debug/debug.go", "internal/statemachine/statemachine.go", "internal/tape/tape.go"]
+files = [
+    "cmd/subscriber/main.go",
+    "cmd/subscriber/server.go",
+    "internal/debug/debug.go",
+    "internal/statemachine/statemachine.go",
+    "internal/tape/tape.go"
+]
