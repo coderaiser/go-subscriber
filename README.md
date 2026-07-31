@@ -1,7 +1,5 @@
 # Subscriber [![License][LicenseIMGURL]][LicenseURL] [![Build Status][BuildStatusIMGURL]][BuildStatusURL] [![Coverage Status][CoverageIMGURL]][CoverageURL]
 
-![image](https://user-images.githubusercontent.com/1573141/223524904-4175548f-1e30-4745-bf2e-c2f4ea39fef5.png)
-
 [BuildStatusURL]: https://github.com/coderaiser/go-subscriber/actions/workflows/test.yml
 [BuildStatusIMGURL]: https://github.com/coderaiser/go-subscriber/actions/workflows/test.yml/badge.svg
 [LicenseURL]: https://tldrlegal.com/license/mit-license "MIT License"
