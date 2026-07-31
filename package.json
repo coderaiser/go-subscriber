@@ -1,9 +1,9 @@
 {
   "name": "go-subscriber",
+  "version": "1.0.2",
   "private": true,
   "type": "module",
-  "version": "1.0.2",
-  "description": "Tape for Go",
+  "description": "Subscription engine simulator",
   "main": "index.js",
   "scripts": {
     "test": "madrun test",
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@putout/plugin-goreleaser": "^1.0.0",
     "eslint-plugin-putout": "^31.4.1",
+    "jiti": "^2.7.0",
     "madrun": "^13.0.4",
     "putout": "^42.10.4"
   }

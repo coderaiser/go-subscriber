@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = {
+export default {
     'test': () => 'task test',
     'coverage': () => 'task coverage',
     'build': () => 'task build',
