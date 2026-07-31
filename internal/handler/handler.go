@@ -244,7 +244,12 @@ func New(eng *engine.Engine, states *store.StateStore) http.Handler {
 func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(v)
+
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		// Response headers are already written, so we cannot change the status.
+		// Log the failure for diagnostics.
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 // stubHandler returns an HTTP handler that responds with a static JSON stub.
