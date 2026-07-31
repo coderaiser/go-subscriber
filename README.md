@@ -1,4 +1,13 @@
-# Subscriber
+# Subscriber [![License][LicenseIMGURL]][LicenseURL] [![Build Status][BuildStatusIMGURL]][BuildStatusURL] [![Coverage Status][CoverageIMGURL]][CoverageURL]
+
+![image](https://user-images.githubusercontent.com/1573141/223524904-4175548f-1e30-4745-bf2e-c2f4ea39fef5.png)
+
+[BuildStatusURL]: https://github.com/coderaiser/go-subscriber/actions?query=workflow%3A%22Node+CI%22 "Build Status"
+[BuildStatusIMGURL]: https://github.com/coderaiser/go-subscriber/workflows/Node%20CI/badge.svg
+[LicenseURL]: https://tldrlegal.com/license/mit-license "MIT License"
+[LicenseIMGURL]: https://img.shields.io/badge/license-MIT-317BF9.svg?style=flat
+[CoverageURL]: https://coveralls.io/github/coderaiser/go-subscriber?branch=master
+[CoverageIMGURL]: https://coveralls.io/repos/coderaiser/go-subscriber/badge.svg?branch=master&service=github
 
 Subscription engine simulator. HTTP service that tracks every `(msisdn, service)`pair through its billing lifecycle: trial → active → suspended → terminated/removed.
 
