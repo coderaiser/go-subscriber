@@ -92,12 +92,6 @@ func TestTapeTB(t *testing.T) {
 	})
 }
 
-func TestTapePass(t *testing.T) {
-	Test.Test(t, "tape: Pass does not fail", func(t *Test.T) {
-		t.Pass()
-		t.End()
-	})
-}
 
 func TestTapeComment(t *testing.T) {
 	Test.Test(t, "tape: Comment does not fail", func(t *Test.T) {

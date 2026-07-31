@@ -2,6 +2,7 @@ package statemachine_test
 
 import (
 	"errors"
+	"log/slog"
 	"testing"
 
 	Test "github.com/coderaiser/go-subscriber/internal/tape"
@@ -289,3 +290,13 @@ type errSetAdapter struct{}
 
 func (a *errSetAdapter) Get(id string) (*state, error) { s := stateIdle; return &s, nil }
 func (a *errSetAdapter) Set(id string, s state) error  { return errors.New("set failed") }
+
+func TestMachineWithLogger(t *testing.T) {
+	Test.Test(t, "statemachine: WithLogger sets logger and transition still fires", func(t *Test.T) {
+		m := newMachine(t.TB())
+		m.WithLogger(slog.Default())
+		_, err := m.Apply("e1", eventRun, nil)
+		t.NoError(err)
+		t.End()
+	})
+}

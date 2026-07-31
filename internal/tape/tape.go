@@ -3,7 +3,6 @@ package tape
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 	"testing"
 )
@@ -97,20 +96,7 @@ func (t *T) NotMatch(s, substr string) {
 	}
 }
 
-// MatchRegex fails if s does not match the regex pattern.
-func (t *T) MatchRegex(s, pattern string) {
-	t.Helper()
-	matched, err := regexp.MatchString(pattern, s)
-	if err != nil {
-		t.parent.Fatalf("invalid regex %q: %v", pattern, err)
-	}
-	if !matched {
-		t.parent.Fatalf("expected %q to match %q", s, pattern)
-	}
-}
 
-// Pass is a no-op that always passes.
-func (t *T) Pass() {}
 
 // Comment is a no-op that prints a message.
 func (t *T) Comment(msg string) {

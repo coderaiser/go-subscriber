@@ -50,3 +50,18 @@ func TestSeedInvalidJSON(t *testing.T) {
 		t.End()
 	})
 }
+
+func TestSeedUnreadableFile(t *testing.T) {
+	Test.Test(t, "store: Seed with unreadable file returns error", func(t *Test.T) {
+		if os.Getuid() == 0 {
+			t.TB().Skip("running as root; permission checks do not apply")
+		}
+		dir := t.TB().TempDir()
+		path := filepath.Join(dir, "noperm.json")
+		os.WriteFile(path, []byte(`[]`), 0000)
+		ss := store.NewStateStore()
+		err := store.Seed(path, ss)
+		t.Error(err)
+		t.End()
+	})
+}
