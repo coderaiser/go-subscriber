@@ -1,4 +1,4 @@
-# Subsriber
+# Subscriber
 
 Subscription engine simulator. HTTP service that tracks every `(msisdn, service)`
 pair through its billing lifecycle: trial → active → suspended → terminated/removed.
@@ -63,7 +63,7 @@ the spec. See `DECISIONS.md` for the full reasoning.
 
 ## State machine
 
-\`\`\`
+```
 (no state) ── subscribe trial ──────────► trial
 (no state) ── subscribe paid ───────────► active
 
@@ -80,7 +80,7 @@ suspended  ── kick_out ─────────────────�
 suspended  ── unsubscribe ──────────────► terminated
 
 terminated/removed ── (cooloff 30d) ───► can re-subscribe
-\`\`\`
+```
 
 ## Endpoints
 
@@ -100,85 +100,97 @@ terminated/removed ── (cooloff 30d) ───► can re-subscribe
 
 ## Running locally
 
-\`\`\`sh
+```sh
 go run ./cmd/subscriber
 curl http://localhost:8080/healthz
 
 # with debug logging
+
 DEBUG=subscriber:* go run ./cmd/subscriber
 
 # json logs (production style)
+
 LOG_FORMAT=json PORT=8080 go run ./cmd/subscriber
-\`\`\`
+```
 
 ## Flags
 
-\`\`\`
+```
 -v, --version   print version and exit
 -h, --help      print this help and exit
-\`\`\`
+```
 
 ## Testing
 
-\`\`\`sh
+```sh
+
 # run all tests
+
 go test ./...
 
 # with coverage
+
 go test -coverprofile=coverage.out -covermode=atomic ./...
 go tool cover -func=coverage.out
-\`\`\`
+```
 
 ## Docker
 
-\`\`\`sh
+```sh
 docker build -t go-subscriber .
 docker run --rm go-subscriber --version
 docker run --rm -p 8080:8080 go-subscriber
-\`\`\`
+```
 
 ## Manual testing
 
 Run the demo script (requires `jq`):
 
-\`\`\`sh
+```sh
 go run ./cmd/subscriber &
 bash demo.sh
-\`\`\`
+```
 
 Or open `demo.http` in VS Code (REST Client extension) or JetBrains HTTP Client.
 
 ## Kubernetes (k3d)
 
-\`\`\`sh
+```sh
+
 # create local cluster
+
 k3d cluster create subscriber -p "8080:80@loadbalancer"
 
 # deploy
+
 kubectl apply -k deploy/k8s/overlays/ci
 
 # wait
+
 kubectl -n subscriber rollout status deployment/subscriber
 
 # test
+
 curl http://localhost:8080/healthz
 
 # logs
+
 kubectl -n subscriber logs -l app=subscriber -f
 
 # tear down
+
 k3d cluster delete subscriber
-\`\`\`
+```
 
 ## Release
 
 Push a tag to trigger build → test → coverage check → goreleaser publishes
 6-platform binaries to GitHub Releases.
 
-\`\`\`sh
+```sh
 git tag v1.0.0
 git push origin v1.0.0
-\`\`\`
+```
 
 ## Future
 

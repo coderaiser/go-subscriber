@@ -121,17 +121,17 @@ func startTestServer(ctx context.Context) (string, context.CancelFunc) {
 
 	ctx, cancel := context.WithCancel(ctx)
 	go func() {
-    	if err := srv.Serve(lis); err != nil && err != http.ErrServerClosed {
-    		panic(err)
-    	}
-    }()
+		if err := srv.Serve(lis); err != nil && err != http.ErrServerClosed {
+			panic(err)
+		}
+	}()
 	go func() {
-    	<-ctx.Done()
-    
-    	if err := srv.Close(); err != nil {
-    		log.Error("failed to close server", "error", err)
-    	}
-    }()
+		<-ctx.Done()
+
+		if err := srv.Close(); err != nil {
+			log.Error("failed to close server", "error", err)
+		}
+	}()
 
 	return "http://" + lis.Addr().String(), cancel
 }

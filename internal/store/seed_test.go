@@ -1,10 +1,10 @@
 package store_test
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
-	"fmt"
 
 	"github.com/coderaiser/go-subscriber/internal/store"
 	. "github.com/coderaiser/go-subscriber/internal/tape"

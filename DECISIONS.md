@@ -45,4 +45,3 @@ The machine table stays a faithful 9-row map of the spec's 5 real states.
 If that fails, something is fundamentally broken — not a runtime condition.
 **Decision: panic immediately.** Returning nil would hide a programming error
 behind a nil pointer dereference elsewhere.
-

@@ -33,12 +33,12 @@ func Seed(path string, ss stateSetter) error {
 		return err
 	}
 
-    for _, e := range entries {
-        key := e.Msisdn + ":" + e.ServiceID
+	for _, e := range entries {
+		key := e.Msisdn + ":" + e.ServiceID
 
-        if err := ss.Set(key, e.State); err != nil {
-            return err
-        }
-    }
+		if err := ss.Set(key, e.State); err != nil {
+			return err
+		}
+	}
 	return nil
 }

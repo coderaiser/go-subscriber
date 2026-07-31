@@ -1,8 +1,12 @@
 *.swp
 *.log
+*.out
+*.lock
 
 .idea
 .DS_Store
-*.out
-/subscriber
+
 coverage_gaps.out
+
+/subscriber
+coverage

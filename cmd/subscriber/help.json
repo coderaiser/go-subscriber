@@ -1,13 +1,13 @@
 {
-  "flags": {
-    "-v, --version": "print version and exit",
-    "-h, --help":    "print this help and exit"
-  },
-  "env": {
-    "PORT":           "HTTP port to listen on (default: 8080)",
-    "LOG_FORMAT":     "log format: json or text (default: text locally, json in prod)",
-    "DEBUG":          "enable debug logs: subscriber:*, subscriber:engine, subscriber:statemachine"
-  },
-  "flagOrder": ["-v, --version", "-h, --help"],
-  "envOrder":  ["PORT", "LOG_FORMAT", "DEBUG"]
+    "flags": {
+        "-v, --version": "print version and exit",
+        "-h, --help": "print this help and exit"
+    },
+    "env": {
+        "PORT": "HTTP port to listen on (default: 8080)",
+        "LOG_FORMAT": "log format: json or text (default: text locally, json in prod)",
+        "DEBUG": "enable debug logs: subscriber:*, subscriber:engine, subscriber:statemachine"
+    },
+    "flagOrder": ["-v, --version", "-h, --help"],
+    "envOrder": ["PORT", "LOG_FORMAT", "DEBUG"]
 }
