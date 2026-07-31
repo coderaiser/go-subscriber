@@ -448,3 +448,17 @@ func TestPermanentFailBlocksRetry(t *testing.T) {
 		t.End()
 	})
 }
+
+func TestSubscribeTrialAfterUnsubscribeIsRejected(t *testing.T) {
+	Test.Test(t, "engine: trial after unsubscribe+re-subscribe is rejected with ErrTrialAlreadyUsed", func(t *Test.T) {
+		ss := store.NewStateStore()
+		fs := store.NewFactsStore()
+		eng := engine.New(ss, fs, fixed(epoch), slog.Default())
+		eng.Subscribe("111", "svc1", true)
+		eng.Unsubscribe("111", "svc1")
+		eng2 := engine.New(ss, fs, fixed(epoch.AddDate(0, 0, 31)), slog.Default())
+		err := eng2.Subscribe("111", "svc1", true)
+		t.Equal(err, engine.ErrTrialAlreadyUsed)
+		t.End()
+	})
+}
