@@ -1,0 +1,6 @@
+version: 2
+builds:
+  - main: ./cmd/subscriber
+    binary: subscriber
+archives:
+  - format: binary
