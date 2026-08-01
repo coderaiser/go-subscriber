@@ -1,3 +1,8 @@
+2026.08.01, v1.0.6
+
+fix:
+- 8262d2d goreleaser: formats
+
 2026.08.01, v1.0.5
 
 feature:
