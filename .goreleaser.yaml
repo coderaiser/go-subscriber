@@ -3,7 +3,7 @@ builds:
   - main: ./cmd/subscriber
     binary: subscriber
 checksum:
-  name_template: subscriber{{ .Version }}_checksums.txt
+  name_template: "subscriber_{{ .Version }}_checksums.txt"
 archives:
   - formats:
       - binary
