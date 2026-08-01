@@ -1,6 +1,6 @@
 {
   "name": "go-subscriber",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "type": "module",
   "description": "Subscription engine simulator",
