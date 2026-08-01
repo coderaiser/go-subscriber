@@ -3,4 +3,5 @@ builds:
   - main: ./cmd/subscriber
     binary: subscriber
 archives:
-  - formats: ["binary"]
+  - formats:
+      - binary
