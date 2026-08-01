@@ -61,7 +61,7 @@ func newWithSource(
 	now func() time.Time,
 	log *slog.Logger,
 ) *Engine {
-	m, err := statemachine.New(source, parseState, parseEvent, states, false)
+	m, err := statemachine.New(source, parseState, parseEvent, states)
 	if err != nil {
 		panic("subscriber: failed to build state machine: " + err.Error())
 	}

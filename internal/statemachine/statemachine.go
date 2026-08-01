@@ -47,7 +47,6 @@ type HookFunc[S, E comparable] func(ctx Context[S, E]) error
 type Machine[S, E comparable] struct {
 	transitions map[S]map[E]S
 	adapter     Adapter[S]
-	strict      bool
 	initial     *S
 	hooks       map[S]map[E][]HookFunc[S, E]
 	log         *slog.Logger
@@ -59,11 +58,9 @@ func New[S, E comparable](
 	parseState func(string) (S, error),
 	parseEvent func(string) (E, error),
 	adapter Adapter[S],
-	strict bool,
 ) (*Machine[S, E], error) {
 	m := &Machine[S, E]{
 		adapter:     adapter,
-		strict:      strict,
 		transitions: make(map[S]map[E]S),
 		hooks:       make(map[S]map[E][]HookFunc[S, E]),
 		log:         slog.New(noopHandler{}),
@@ -164,9 +161,6 @@ func (m *Machine[S, E]) Apply(id string, event E, data any) (S, error) {
 func (m *Machine[S, E]) handleInvalid(id string, current S, event E) (S, error) {
 	var zero S
 	err := fmt.Errorf("no transition from %v on event %v", current, event)
-	if m.strict {
-		panic(err.Error())
-	}
 	return zero, err
 }
 

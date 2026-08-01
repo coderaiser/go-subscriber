@@ -58,7 +58,7 @@ func newMachine(t *testing.T) *statemachine.Machine[state, event] {
 			{From: "running", Event: "fail", To: "done"},
 		},
 	}
-	m, err := statemachine.New(src, parseState, parseEvent, statemachine.NewMemory[state](), false)
+	m, err := statemachine.New(src, parseState, parseEvent, statemachine.NewMemory[state]())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +82,7 @@ func TestMachineStoresState(t *testing.T) {
 				{From: "idle", Event: "run", To: "running"},
 			},
 		}
-		m, _ := statemachine.New(src, parseState, parseEvent, mem, false)
+		m, _ := statemachine.New(src, parseState, parseEvent, mem)
 		m.Apply("e1", eventRun, nil)
 		ptr, _ := mem.Get("e1")
 		t.Ok(ptr != nil)
@@ -98,7 +98,7 @@ func TestMachineStoresStateValue(t *testing.T) {
 				{From: "idle", Event: "run", To: "running"},
 			},
 		}
-		m, _ := statemachine.New(src, parseState, parseEvent, mem, false)
+		m, _ := statemachine.New(src, parseState, parseEvent, mem)
 		m.Apply("e1", eventRun, nil)
 		ptr, _ := mem.Get("e1")
 		t.Ok(*ptr == stateRunning)
@@ -107,27 +107,11 @@ func TestMachineStoresStateValue(t *testing.T) {
 }
 
 func TestMachineInvalidTransitionNonStrict(t *testing.T) {
-	Test.Test(t, "statemachine: invalid transition returns error in non-strict mode", func(t *Test.T) {
+	Test.Test(t, "statemachine: invalid transition returns error", func(t *Test.T) {
 		m := newMachine(t.TB())
 		_, err := m.Apply("e1", eventFinish, nil)
 		t.Error(err)
 		t.End()
-	})
-}
-
-func TestMachineInvalidTransitionStrict(t *testing.T) {
-	Test.Test(t, "statemachine: invalid transition panics in strict mode", func(t *Test.T) {
-		src := &statemachine.MemorySource{
-			Defs: []statemachine.TransitionDef{
-				{From: "idle", Event: "run", To: "running"},
-			},
-		}
-		m, _ := statemachine.New(src, parseState, parseEvent, statemachine.NewMemory[state](), true)
-		defer func() {
-			t.Ok(recover() != nil)
-			t.End()
-		}()
-		m.Apply("e1", eventFinish, nil)
 	})
 }
 
@@ -221,7 +205,7 @@ func TestNewWithBadFromState(t *testing.T) {
 				{From: "bad", Event: "run", To: "running"},
 			},
 		}
-		_, err := statemachine.New(src, parseState, parseEvent, statemachine.NewMemory[state](), false)
+		_, err := statemachine.New(src, parseState, parseEvent, statemachine.NewMemory[state]())
 		t.Error(err)
 		t.End()
 	})
@@ -234,7 +218,7 @@ func TestNewWithBadEvent(t *testing.T) {
 				{From: "idle", Event: "bad", To: "running"},
 			},
 		}
-		_, err := statemachine.New(src, parseState, parseEvent, statemachine.NewMemory[state](), false)
+		_, err := statemachine.New(src, parseState, parseEvent, statemachine.NewMemory[state]())
 		t.Error(err)
 		t.End()
 	})
@@ -247,7 +231,7 @@ func TestNewWithBadToState(t *testing.T) {
 				{From: "idle", Event: "run", To: "bad"},
 			},
 		}
-		_, err := statemachine.New(src, parseState, parseEvent, statemachine.NewMemory[state](), false)
+		_, err := statemachine.New(src, parseState, parseEvent, statemachine.NewMemory[state]())
 		t.Error(err)
 		t.End()
 	})
@@ -260,7 +244,7 @@ func TestAdapterGetError(t *testing.T) {
 				{From: "idle", Event: "run", To: "running"},
 			},
 		}
-		m, _ := statemachine.New(src, parseState, parseEvent, &errGetAdapter{}, false)
+		m, _ := statemachine.New(src, parseState, parseEvent, &errGetAdapter{})
 		_, err := m.Apply("x", eventRun, nil)
 		t.Error(err)
 		t.End()
@@ -274,7 +258,7 @@ func TestAdapterSetError(t *testing.T) {
 				{From: "idle", Event: "run", To: "running"},
 			},
 		}
-		m, _ := statemachine.New(src, parseState, parseEvent, &errSetAdapter{}, false)
+		m, _ := statemachine.New(src, parseState, parseEvent, &errSetAdapter{})
 		_, err := m.Apply("x", eventRun, nil)
 		t.Error(err)
 		t.End()
