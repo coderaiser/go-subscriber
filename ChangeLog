@@ -1,3 +1,9 @@
+2026.08.01, v1.0.5
+
+feature:
+- b5ebdd0 statemachine: rm strict
+- 67bf5f5 deliverables: add
+
 2026.07.31, v1.0.4
 
 fix:
