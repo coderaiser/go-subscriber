@@ -53,8 +53,8 @@ the current state string per key and satisfies `Adapter[string]`. `FactsStore`is
 which persist across subscriptions and have no place in the machine. Keeping
 them separate means the machine stays generic and the engine owns its invariants.
 
-**StateMachine vendored from go-tape** — `internal/statemachine/statemachine.go`is a single-file vendor of the statemachine package from[coderaiser/go-tape](https://github.com/coderaiser/go-tape). TOML support
-removed (external dep). Memory adapter merged into the same file. No `go.mod`dependency — the code is ours to read and explain in a review.
+**StateMachine vendored from go-tape** — `internal/statemachine/statemachine.go`is a single-file vendor of the statemachine package from [`go-tape`](https://github.com/coderaiser/go-tape). TOML support removed (external dep). Memory adapter merged into the same file.
+No `go.mod` dependency — the code is ours to read and explain in a review.
 
 **Ladder counter in the engine, not the machine** — the spec's `LOW_BALANCE`fallback (3 attempts before suspending) does not map to FSM states. Modelling
 it as `fallback_1`/`fallback_2` states would invent states the spec does not
