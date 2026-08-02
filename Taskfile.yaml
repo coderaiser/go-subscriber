@@ -9,6 +9,11 @@ tasks:
       Run tests with subscriber scoped to the library package only.
       run.go (CLI glue) is intentionally excluded.
     cmds:
+      - coverage || tape
+  report:
+    desc: |
+      Coverage Report
+    cmds:
       - coverage --report || tape
   build:
     desc: Build the binary for the current platform
